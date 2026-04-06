@@ -500,7 +500,6 @@
       <li class="fragment"><span class="highlight-red">Race conditions</span>; concurrent writes corrupt data</li>
       <li class="fragment"><span class="highlight-red">Resource exhaustion</span>; connection pools, memory, file descriptors</li>
       <li class="fragment"><span class="highlight-red">Slow pages</span>; acceptable at 1 user, unusable at 100</li>
-      <li class="fragment"><span class="highlight-red">Cascading failures</span>; one slow query blocks everything</li>
     </ul>
   </section>
   <section>
@@ -551,14 +550,13 @@
 <section>
   <section>
     <h2>The Demo App: <span class="title-accent">SplitDumb</span></h2>
-    <p>A Splitwise-like expense splitting app</p>
+    <p>A Splitwise vibe-coded clone</p>
     <div class="two-col" style="margin-top: 1em;">
       <div>
         <h4>Backend</h4>
         <ul class="small">
           <li>Express.js + PostgreSQL</li>
           <li>REST API</li>
-          <li>Connection pool: <code>max: 2</code></li>
         </ul>
       </div>
       <div>
@@ -571,19 +569,6 @@
       </div>
     </div>
   </section>
-  <section>
-    <h2>Architecture</h2>
-    <div class="diagram">
-&nbsp; Browser (Next.js :3001)
-&nbsp;     |
-&nbsp;     v
-&nbsp; Express API (:3000)
-&nbsp;     |
-&nbsp;     v
-&nbsp; PostgreSQL (:5432)
-&nbsp;   Pool: max=<span class="em-red">2</span>  &lt;-- intentionally small!
-    </div>
-  </section>
 </section>
 
 <!-- ============================================================ -->
@@ -591,8 +576,8 @@
 <!-- ============================================================ -->
 <section>
   <section>
-    <h2>The Planted Bugs</h2>
-    <p>Two <em>intentional</em> bugs that only surface under load</p>
+    <h2>The bad code</h2>
+    <p>Two bugs that only surface under load</p>
   </section>
   <section>
     <h2>Bug 1: <span class="highlight-red">Race Condition</span></h2>
@@ -615,20 +600,7 @@ await pool.query(
 );
     </code></pre>
   </section>
-  <section>
-    <h2>The Lost Update Problem</h2>
-    <div class="diagram">
-  Balance = $1000
 
-  VU-1: READ  balance &rarr; $1000
-  VU-2: READ  balance &rarr; $1000    <span class="em-red">(stale!)</span>
-  VU-1: WRITE balance = $1000 - $10 = <span class="em-green">$990</span>
-  VU-2: WRITE balance = $1000 - $10 = <span class="em-red">$990  (overwrites VU-1!)</span>
-
-  Expected: $980 &nbsp;|&nbsp; Actual: <span class="em-red">$990</span>
-  <span class="em-red">$10 appeared out of thin air!</span>
-    </div>
-  </section>
   <section>
     <h2>Bug 2: <span class="highlight-red">Pool Exhaustion</span></h2>
     <div class="two-col">
@@ -636,17 +608,15 @@ await pool.query(
         <pre><code class="javascript" data-trim>
 // db.js
 const pool = new Pool({
-  max: 2,  // only 2 connections!
-  connectionTimeoutMillis: 2000,
+  max: 2,
+  connectionTimeoutMillis: 50,
 });
         </code></pre>
       </div>
       <div>
         <ul class="small" style="margin-top: 0.5em;">
-          <li>Pool allows only <strong>2</strong> concurrent connections</li>
+          <li>Pool allows only <strong>2</strong> concurrent connections, timing out after <strong>50ms</strong></li>
           <li>Each <code>/pay</code> holds a connection for ~50ms</li>
-          <li>10 concurrent users = 8 waiting</li>
-          <li>After 2s timeout &rarr; <strong>500 errors</strong></li>
         </ul>
       </div>
     </div>
@@ -725,12 +695,6 @@ export async function uiTest() {
       </thead>
       <tbody>
         <tr>
-          <td><code>browse</code></td>
-          <td>Navigate pages</td>
-          <td>1&rarr;5</td>
-          <td>Baseline performance</td>
-        </tr>
-        <tr>
           <td><code>expenses</code></td>
           <td>Create expenses via UI</td>
           <td>3</td>
@@ -776,11 +740,9 @@ export async function raceCondition(data) {
     <h2>Thresholds</h2>
     <pre><code class="javascript" data-trim>
 thresholds: {
-  // Performance
   page_load_duration: ['p(95)<3000'],
   custom_errors: ['count<50'],
 
-  // These WILL fail -- proving the bugs!
   race_condition_drift: ['count==0'],
   pool_exhaustion_errors: ['count==0'],
 }
@@ -806,81 +768,7 @@ npm run test:pool       # pool exhaustion
 <!-- ============================================================ -->
 <!-- RESULTS - RACE CONDITION -->
 <!-- ============================================================ -->
-<section>
-  <section>
-    <h2>Expected Results: Race Condition</h2>
-    <div class="bug-box">
-      <pre style="margin: 0; font-size: 0.9em; border: none;"><code data-trim class="text">
-=== RACE CONDITION RESULTS ===
-Starting balance: $1000
-Expected payments: 100 x $10 = $1000
-Expected final balance: $0
-Actual final balance:   $???
-Drift (lost money):     $???
-BUG: $$$ was "created" due to lost updates!
-==============================
-      </code></pre>
-    </div>
-    <p class="fragment" style="margin-top: 0.5em;">Money appeared out of thin air; <br/>a real financial bug hiding in plain sight</p>
-  </section>
-  <section>
-    <h2>The Fix</h2>
-    <div class="two-col">
-      <div>
-        <p class="highlight-red" style="font-size: 0.8em;">Before (non-atomic)</p>
-        <pre><code class="sql" data-trim>
-SELECT balance FROM users
-  WHERE id = $1;
--- app calculates new balance
-UPDATE users
-  SET balance = $newBal
-  WHERE id = $1;
-        </code></pre>
-      </div>
-      <div>
-        <p class="highlight-green" style="font-size: 0.8em;">After (atomic)</p>
-        <pre><code class="sql" data-trim>
-UPDATE users
-  SET balance = balance - $1
-  WHERE id = $2
-  AND balance >= $1
-  RETURNING balance;
-        </code></pre>
-      </div>
-    </div>
-    <p class="fragment small" style="margin-top: 1em;">Or use: <code>SELECT ... FOR UPDATE</code>, optimistic locking, serializable transactions</p>
-  </section>
-</section>
-
 <!-- ============================================================ -->
-<!-- RESULTS - POOL EXHAUSTION -->
-<!-- ============================================================ -->
-<section>
-  <section>
-    <h2>Expected Results: Pool Exhaustion</h2>
-    <div class="bug-box">
-      <p>With <code>max: 2</code> connections and 10 concurrent VUs:</p>
-      <ul class="small">
-        <li>8 VUs wait for a free connection</li>
-        <li>After 2 seconds &rarr; timeout &rarr; <strong>500 error</strong></li>
-        <li>Users see errors on the page</li>
-      </ul>
-    </div>
-  </section>
-  <section>
-    <h2>The Fix</h2>
-    <div class="ok-box">
-      <pre style="margin: 0; border: none;"><code class="javascript" data-trim>
-const pool = new Pool({
-  max: 20,  // sensible default
-  connectionTimeoutMillis: 5000,
-  idleTimeoutMillis: 30000,
-});
-      </code></pre>
-    </div>
-  </section>
-</section>
-
 <!-- ============================================================ -->
 <!-- TAKEAWAYS -->
 <!-- ============================================================ -->
