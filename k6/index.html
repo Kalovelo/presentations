@@ -21,6 +21,7 @@
     --slate-100: #f1f5f9;
     --slate-200: #e2e8f0;
     --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
     --slate-500: #64748b;
     --slate-700: #334155;
     --slate-800: #1e293b;
@@ -285,23 +286,16 @@
   }
 
   .compass-nav .north { top: 0; left: 50%; transform: translateX(-50%); }
-  .compass-nav .south { bottom: 0; left: 50%; transform: translateX(-50%); }
+  .compass-nav .south { bottom: 0; left: 47%; transform: translateX(-50%); }
   .compass-nav .west { left: 0; top: 50%; transform: translateY(-50%); }
   .compass-nav .east { right: 0; top: 50%; transform: translateY(-50%); }
 
-  @media (max-width: 768px) {
-    .compass-nav {
-      bottom: 2.5em;
-      right: 50%;
-      transform: translateX(50%);
-    }
-  }
 
   .slide-footer {
     position: fixed;
     bottom: 1em;
-    left: 1.5em;
-    right: 1.5em;
+    left: 4.8em;
+    right: 4.8em;
     display: flex;
     justify-content: space-between;
     font-family: 'Kode Mono', monospace;
@@ -318,9 +312,121 @@
   .slide-footer a:hover {
     color: var(--accent-500);
   }
+
+  .theme-toggle {
+    position: fixed;
+    top: 1em;
+    left: 6.5em;
+    background: none;
+    border: none;
+    padding: 0.4em;
+    line-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--slate-400);
+    cursor: pointer;
+    transition: color 0.2s;
+    z-index: 200;
+  }
+  .theme-toggle:hover {
+    color: var(--accent-500);
+  }
+
+  @media (max-width: 768px) {
+    .theme-toggle {
+      top: 0.75em;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .compass-nav {
+      bottom: 2.5em;
+      right: 50%;
+      transform: translateX(50%);
+    }
+  }
+
+  /* ── dark mode ── */
+  [data-theme="dark"] body {
+    background: var(--slate-900);
+  }
+  [data-theme="dark"] .reveal-viewport {
+    background: var(--slate-900) !important;
+  }
+  [data-theme="dark"] .reveal {
+    color: var(--slate-200);
+  }
+  [data-theme="dark"] .reveal .slides section {
+    background: var(--slate-900);
+  }
+  [data-theme="dark"] .reveal h1,
+  [data-theme="dark"] .reveal h2,
+  [data-theme="dark"] .reveal h3 {
+    color: var(--slate-100);
+  }
+  [data-theme="dark"] .reveal h4 {
+    color: var(--slate-200);
+  }
+  [data-theme="dark"] .reveal p,
+  [data-theme="dark"] .reveal li {
+    color: var(--slate-200);
+  }
+  [data-theme="dark"] .reveal strong {
+    color: var(--slate-100);
+  }
+  [data-theme="dark"] .reveal pre {
+    border-color: var(--slate-700);
+  }
+  [data-theme="dark"] .reveal pre code {
+    background: var(--slate-800);
+    color: var(--slate-200);
+  }
+  [data-theme="dark"] .reveal pre code .hljs-keyword   { color: #c084fc; }
+  [data-theme="dark"] .reveal pre code .hljs-string    { color: #93c5fd; }
+  [data-theme="dark"] .reveal pre code .hljs-number    { color: #7dd3fc; }
+  [data-theme="dark"] .reveal pre code .hljs-comment   { color: var(--slate-500); }
+  [data-theme="dark"] .reveal pre code .hljs-function  { color: #c084fc; }
+  [data-theme="dark"] .reveal pre code .hljs-title     { color: #fdba74; }
+  [data-theme="dark"] .reveal pre code .hljs-title.function_ { color: #c084fc; }
+  [data-theme="dark"] .reveal pre code .hljs-params    { color: var(--slate-300); }
+  [data-theme="dark"] .reveal pre code .hljs-built_in  { color: #7dd3fc; }
+  [data-theme="dark"] .reveal pre code .hljs-literal   { color: #7dd3fc; }
+  [data-theme="dark"] .reveal pre code .hljs-variable  { color: #fdba74; }
+  [data-theme="dark"] .reveal pre code .hljs-attr      { color: #7dd3fc; }
+  [data-theme="dark"] .reveal pre code .hljs-operator  { color: #fca5a5; }
+  [data-theme="dark"] .reveal pre code .hljs-punctuation { color: var(--slate-400); }
+  [data-theme="dark"] .reveal code {
+    color: var(--accent-400);
+  }
+  [data-theme="dark"] .reveal .bug-box {
+    background: rgba(239, 68, 68, 0.12);
+  }
+  [data-theme="dark"] .reveal .ok-box {
+    background: rgba(16, 160, 185, 0.12);
+  }
+  [data-theme="dark"] .reveal table th {
+    background: var(--slate-700);
+  }
+  [data-theme="dark"] .reveal table td {
+    border-color: var(--slate-700);
+    color: var(--slate-200);
+  }
+  [data-theme="dark"] .reveal table tr:nth-child(even) td {
+    background: var(--slate-800);
+  }
+  [data-theme="dark"] .reveal .small { color: var(--slate-400); }
+  [data-theme="dark"] .whoami-logo { fill: var(--slate-200) !important; }
+  [data-theme="dark"] .slide-footer,
+  [data-theme="dark"] .slide-footer a {
+    color: var(--slate-500);
+  }
+  [data-theme="dark"] .theme-toggle {
+    color: var(--slate-300);
+  }
 </style>
 </head>
 <body>
+<button class="theme-toggle" id="themeToggle"></button>
 <div class="reveal">
 <div class="slides">
 
@@ -340,7 +446,7 @@
 <!-- WHOAMI -->
 <!-- ============================================================ -->
 <section>
-  <h2><svg xmlns="http://www.w3.org/2000/svg" viewBox="234.464 236.489 199.028 183.621" style="width: 0.8em; height: 0.8em; vertical-align: middle; display: inline-block; fill: var(--slate-800); margin-right: 0.15em;"><path d="M418.85 271.06c-6.12-11.03-14.83-20.59-25.22-27.45-.29-.19-.57-.37-.84-.46-.47-.37-.93-.65-1.4-.93a40.868 40.868 0 00-5.09-2.88c-.1-.09-.19-.09-.29-.09-1.02-.37-2.03-.74-3.06-.93-.54-.18-1.11-.27-1.66-.37-.83-.18-1.57-.28-2.41-.37-.66-.09-1.4-.09-2.05-.09-.83 0-1.67 0-2.49.09-12.63 1.3-22.55 11.87-22.55 24.86 0 2.32.37 4.54.93 6.68.28.83.55 1.67.83 2.41.09.09.09.28.19.37.47.93.92 1.85 1.39 2.69.19.46.46.93.74 1.39.09.09.19.19.29.37.27.37.45.74.74 1.02.37.46.74.93 1.11 1.39 1.48 2.04 3.05 3.62 4.82 5.2 4.82 4.73 9.46 9.27 13.73 14.37 4.17 5.01 8.16 10.58 10.57 17.16 2.5 6.4 3.24 13.63 2.78 20.87-.92 14.28-7.7 29.03-19.29 40.07-11.6 11.03-27.63 18.08-44.52 19.2-16.88 1.11-34.5-2.79-48.97-12.62-14.66-9.46-25.97-24.39-30.61-41.74-4.55-17.34-2.6-36.72 6.49-52.95 8.82-16.33 24.02-29.22 41.66-36.36.26-.19.45-.47.37-.84-.11-.37-.48-.55-.85-.37-18.27 6.03-35.05 18.09-45.63 34.88-5.38 8.34-9.37 17.62-11.49 27.54a84.81 84.81 0 00-.47 30.24c3.62 20.12 15.02 38.95 31.25 52.12 16.14 13.45 37.19 20.78 58.54 21.52 21.41.74 43.39-5.47 62.03-18.09 18.55-12.52 33.3-32.46 39.15-55.83 2.96-11.69 3.61-23.93 2.22-36.27-1.48-12.24-4.82-24.67-10.94-35.8z"/></svg> whoami</h2>
+  <h2><svg xmlns="http://www.w3.org/2000/svg" viewBox="234.464 236.489 199.028 183.621" class="whoami-logo" style="width: 0.8em; height: 0.8em; vertical-align: middle; display: inline-block; fill: var(--slate-800); margin-right: 0.15em;"><path d="M418.85 271.06c-6.12-11.03-14.83-20.59-25.22-27.45-.29-.19-.57-.37-.84-.46-.47-.37-.93-.65-1.4-.93a40.868 40.868 0 00-5.09-2.88c-.1-.09-.19-.09-.29-.09-1.02-.37-2.03-.74-3.06-.93-.54-.18-1.11-.27-1.66-.37-.83-.18-1.57-.28-2.41-.37-.66-.09-1.4-.09-2.05-.09-.83 0-1.67 0-2.49.09-12.63 1.3-22.55 11.87-22.55 24.86 0 2.32.37 4.54.93 6.68.28.83.55 1.67.83 2.41.09.09.09.28.19.37.47.93.92 1.85 1.39 2.69.19.46.46.93.74 1.39.09.09.19.19.29.37.27.37.45.74.74 1.02.37.46.74.93 1.11 1.39 1.48 2.04 3.05 3.62 4.82 5.2 4.82 4.73 9.46 9.27 13.73 14.37 4.17 5.01 8.16 10.58 10.57 17.16 2.5 6.4 3.24 13.63 2.78 20.87-.92 14.28-7.7 29.03-19.29 40.07-11.6 11.03-27.63 18.08-44.52 19.2-16.88 1.11-34.5-2.79-48.97-12.62-14.66-9.46-25.97-24.39-30.61-41.74-4.55-17.34-2.6-36.72 6.49-52.95 8.82-16.33 24.02-29.22 41.66-36.36.26-.19.45-.47.37-.84-.11-.37-.48-.55-.85-.37-18.27 6.03-35.05 18.09-45.63 34.88-5.38 8.34-9.37 17.62-11.49 27.54a84.81 84.81 0 00-.47 30.24c3.62 20.12 15.02 38.95 31.25 52.12 16.14 13.45 37.19 20.78 58.54 21.52 21.41.74 43.39-5.47 62.03-18.09 18.55-12.52 33.3-32.46 39.15-55.83 2.96-11.69 3.61-23.93 2.22-36.27-1.48-12.24-4.82-24.67-10.94-35.8z"/></svg> whoami</h2>
   <div style="display: flex; align-items: flex-start; gap: 2em; text-align: left;">
     <div style="flex: 1;">
       <h3 style="margin-bottom: 0.2em;">Apostolos Kalovelonis</h3>
@@ -811,7 +917,7 @@ const pool = new Pool({
 </div>
 
 <div class="slide-footer">
-  <span>Apostolos Kalovelonis</span>
+  <span>A. Kalovelonis</span>
   <a href="https://kalovelo.com" target="_blank">kalovelo.com</a>
 </div>
 
@@ -881,6 +987,27 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'ArrowLeft') animateDirection('west');
   else if (e.key === 'ArrowDown') animateDirection('south');
   else if (e.key === 'ArrowUp') animateDirection('north');
+});
+
+// Dark mode
+const themeToggle = document.getElementById('themeToggle');
+const rootEl = document.documentElement;
+
+const SUN = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>`;
+const MOON = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+function applyTheme(theme) {
+  rootEl.dataset.theme = theme;
+  themeToggle.innerHTML = theme === 'dark' ? SUN : MOON;
+  themeToggle.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+}
+
+applyTheme(localStorage.getItem('theme') || 'light');
+
+themeToggle.addEventListener('click', () => {
+  const next = rootEl.dataset.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', next);
+  applyTheme(next);
 });
 </script>
 </body>

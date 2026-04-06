@@ -113,20 +113,82 @@
       font-size: 0.8rem;
       color: var(--accent-600);
     }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: none;
+      border: none;
+      padding: 0.4rem;
+      line-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--slate-400);
+      cursor: pointer;
+      transition: color 0.2s;
+      z-index: 1000;
+    }
+    .theme-toggle:hover {
+      color: var(--accent-500);
+    }
+
+    /* ── dark mode ── */
+    [data-theme="dark"] body {
+      background: var(--slate-900);
+      color: var(--slate-200);
+    }
+    [data-theme="dark"] header h1 { color: var(--slate-100); }
+    [data-theme="dark"] .card {
+      background: var(--slate-800);
+      border-color: var(--slate-700);
+    }
+    [data-theme="dark"] .card:hover {
+      border-color: var(--accent-500);
+      box-shadow: 0 4px 20px rgba(16, 160, 185, 0.15);
+    }
+    [data-theme="dark"] .card-title { color: var(--slate-100); }
+    [data-theme="dark"] .card-desc  { color: var(--slate-300); }
+    [data-theme="dark"] .theme-toggle {
+      color: var(--slate-300);
+    }
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="themeToggle"></button>
+
   <header>
     <h1>presentations</h1>
   </header>
 
   <div class="grid">
     <a class="card" href="k6/index.html">
-      <div class="card-tag">load testing</div>
       <div class="card-title">k6</div>
       <div class="card-desc">How to nuke (or load test) your services with k6</div>
       <span class="card-arrow">open →</span>
     </a>
   </div>
+  <script>
+    const toggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
+
+    const SUN = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>`;
+    const MOON = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+    function applyTheme(theme) {
+      root.dataset.theme = theme;
+      toggle.innerHTML = theme === 'dark' ? SUN : MOON;
+      toggle.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+    }
+
+    applyTheme(localStorage.getItem('theme') || 'light');
+
+    toggle.addEventListener('click', () => {
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
+    });
+  </script>
 </body>
 </html>
