@@ -34,14 +34,14 @@ export async function createExpense(data: SeedData): Promise<void> {
     const group = data.groups[Math.floor(Math.random() * data.groups.length)];
     await page.goto(`${BASE_URL}/groups/${group.id}`, { waitUntil: 'networkidle' });
 
-    const expensesTab = page.locator('button:has-text("Expenses")');
+    const expensesTab = page.locator('//button[contains(text(),"Expenses")]');
     if (await expensesTab.isVisible()) {
       await expensesTab.click();
     }
 
     const descInput = page.locator('input[placeholder="Description"]');
     const amountInput = page.locator('input[placeholder="Amount"]');
-    const submitBtn = page.locator('button:has-text("Add Expense")');
+    const submitBtn = page.locator('//button[contains(text(),"Add Expense")]');
 
     if (await submitBtn.isVisible()) {
       await descInput.fill(`k6 browser expense ${Date.now()}`);
