@@ -1,9 +1,8 @@
 import http from 'k6/http';
 import { check } from 'k6';
-import { browser } from 'k6/browser';
 import { Counter } from 'k6/metrics';
 import type { Options } from 'k6/options';
-import { API_URL, BASE_URL, seed, SeedData, User } from './helpers';
+import { API_URL, seed, SeedData, User } from './helpers';
 
 const errors = new Counter('custom_errors');
 const raceConditionDrift = new Counter('race_condition_drift');
@@ -15,13 +14,12 @@ export const options: Options = {
       vus: 10,
       iterations: 10,
       exec: 'raceCondition',
-      options: { browser: { type: 'chromium' } },
     },
     integrity_check: {
       executor: 'per-vu-iterations',
       vus: 1,
       iterations: 1,
-      startTime: '40s',
+      startTime: '10s',
       exec: 'integrityCheck',
     },
   },
@@ -34,26 +32,16 @@ export function setup(): SeedData {
   return seed();
 }
 
-export async function raceCondition(data: SeedData): Promise<void> {
+export function raceCondition(data: SeedData): void {
   if (!data.users || data.users.length === 0) return;
 
   const targetUser = data.users[0];
-  const page = await browser.newPage();
-
-  try {
-    await page.goto(`${BASE_URL}/users/${targetUser.id}/wallet`, { waitUntil: 'networkidle' });
-
-    const payInput = page.locator('[data-testid="pay-amount"]');
-    const payBtn = page.locator('[data-testid="pay-btn"]');
-
-    if (await payBtn.isVisible()) {
-      await payInput.fill('10');
-      await payBtn.click();
-      await page.waitForTimeout(500);
-    }
-  } finally {
-    await page.close();
-  }
+  const res = http.post(
+    `${API_URL}/api/users/${targetUser.id}/pay`,
+    JSON.stringify({ amount: 10 }),
+    { headers: { 'Content-Type': 'application/json' } },
+  );
+  check(res, { 'pay accepted': (r) => r.status === 200 }) || errors.add(1);
 }
 
 export function integrityCheck(data: SeedData): void {

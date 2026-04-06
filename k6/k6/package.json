@@ -3,7 +3,7 @@
   "scripts": {
     "serve": "npx serve .",
     "pdf": "npx decktape reveal http://localhost:3000/slides.html slides.pdf",
-    "build": "esbuild src/*.ts --bundle --outdir=dist --sourcemap --external:k6 --external:k6/*",
+    "build": "esbuild src/*.ts --bundle --format=esm --outdir=dist --sourcemap --external:k6 --external:k6/*",
     "typecheck": "tsc --noEmit",
     "test": "npm run build && K6_BROWSER_ENABLED=true K6_BROWSER_HEADLESS=false k6 run dist/load-test.js",
     "test:browse": "npm run build && K6_BROWSER_ENABLED=true K6_BROWSER_HEADLESS=false k6 run dist/browse.js",
