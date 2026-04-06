@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presentations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Kode+Mono:wght@400;700&display=swap" />
+  <style>
+    :root {
+      --accent-400: #3ec9de;
+      --accent-500: #10a0b9;
+      --accent-600: #0c8499;
+      --accent-700: #096b7d;
+      --slate-50:  #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-500: #64748b;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+      --slate-900: #0f172a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'EB Garamond', serif;
+      background: #ffffff;
+      color: var(--slate-700);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-family: 'Kode Mono', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--slate-800);
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      font-size: 1.1rem;
+      color: var(--slate-500);
+      font-style: italic;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .card {
+      display: block;
+      text-decoration: none;
+      border: 1px solid var(--slate-200);
+      border-radius: 12px;
+      padding: 1.75rem 1.5rem;
+      background: var(--slate-50);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    }
+
+    .card:hover {
+      border-color: var(--accent-500);
+      box-shadow: 0 4px 20px rgba(16, 160, 185, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .card-tag {
+      font-family: 'Kode Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-600);
+      margin-bottom: 0.6rem;
+    }
+
+    .card-title {
+      font-family: 'Kode Mono', monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--slate-800);
+      letter-spacing: 0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 1rem;
+      color: var(--slate-500);
+      line-height: 1.5;
+    }
+
+    .card-arrow {
+      display: inline-block;
+      margin-top: 1rem;
+      font-family: 'Kode Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent-600);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>presentations</h1>
+  </header>
+
+  <div class="grid">
+    <a class="card" href="k6/index.html">
+      <div class="card-tag">load testing</div>
+      <div class="card-title">k6</div>
+      <div class="card-desc">How to nuke (or load test) your services with k6</div>
+      <span class="card-arrow">open →</span>
+    </a>
+  </div>
+</body>
+</html>
