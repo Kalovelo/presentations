@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How to nuke (or loadtest) your services with k6!</title>
+<link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/e/ef/K6-logo.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Kode+Mono:wght@400;700&display=swap" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/github.css" />
+<style>
+  :root {
+    --accent-400: #3ec9de;
+    --accent-500: #10a0b9;
+    --accent-600: #0c8499;
+    --accent-700: #096b7d;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-500: #64748b;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --slate-900: #0f172a;
+    --red-500: #ef4444;
+    --red-600: #dc2626;
+    --amber-500: #f59e0b;
+  }
+
+  .reveal {
+    font-family: 'EB Garamond', serif;
+    color: var(--slate-700);
+  }
+
+  .reveal .slides section {
+    background: #ffffff;
+  }
+
+  .reveal h1, .reveal h2, .reveal h3 {
+    font-family: 'Kode Mono', monospace;
+    text-transform: none;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--slate-800);
+  }
+
+  .reveal h1 { font-size: 1.4em; }
+  .reveal h2 { font-size: 1.3em; }
+  .reveal h3 {
+    font-size: .9em;
+    font-family: 'EB Garamond', serif;
+  }
+  .reveal h4 {
+    font-family: 'Kode Mono', monospace;
+    color: var(--slate-700);
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+
+  .reveal pre {
+    font-size: 0.48em;
+    width: 95%;
+    box-shadow: none;
+    border: 1px solid var(--slate-200);
+    border-radius: 8px;
+  }
+
+  .reveal pre code {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    padding: 1em;
+    background: var(--slate-50);
+    border-radius: 8px;
+    color: var(--slate-800);
+  }
+
+  .reveal pre code .hljs-keyword { color: #8250df; }
+  .reveal pre code .hljs-string { color: #0a3069; }
+  .reveal pre code .hljs-number { color: #0550ae; }
+  .reveal pre code .hljs-comment { color: var(--slate-400); font-style: italic; }
+  .reveal pre code .hljs-function { color: #8250df; }
+  .reveal pre code .hljs-title { color: #953800; }
+  .reveal pre code .hljs-title.function_ { color: #8250df; }
+  .reveal pre code .hljs-params { color: var(--slate-700); }
+  .reveal pre code .hljs-built_in { color: #0550ae; }
+  .reveal pre code .hljs-literal { color: #0550ae; }
+  .reveal pre code .hljs-variable { color: #953800; }
+  .reveal pre code .hljs-attr { color: #0550ae; }
+  .reveal pre code .hljs-property { color: var(--accent-700); }
+  .reveal pre code .hljs-operator { color: #cf222e; }
+  .reveal pre code .hljs-punctuation { color: var(--slate-500); }
+
+  .reveal code {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    color: var(--accent-700);
+  }
+
+  .reveal p, .reveal li {
+    color: var(--slate-700);
+    line-height: 1.6;
+  }
+
+  .reveal strong {
+    color: var(--slate-800);
+    font-weight: 700;
+  }
+
+  .reveal em {
+    color: var(--accent-600);
+    font-style: italic;
+  }
+
+  .reveal .small { font-size: 0.6em; color: var(--slate-500); }
+
+  .reveal .accent { color: var(--accent-500); }
+  .reveal .highlight-red { color: var(--red-500); }
+  .reveal .highlight-green { color: var(--accent-500); }
+  .reveal .highlight-amber { color: var(--amber-500); }
+
+  .reveal ul { list-style: none; }
+  .reveal ul li { padding: 0.25em 0; }
+  .reveal ul li::before { content: ""; margin-right: 0; }
+
+  .reveal ol { color: var(--slate-700); }
+  .reveal ol li { padding: 0.15em 0; }
+
+.reveal .two-col { display: flex; gap: 2em; }
+  .reveal .two-col > * { flex: 1; }
+
+  .reveal .bug-box {
+    background: #fef2f2;
+    border: 2px solid var(--red-500);
+    border-radius: 12px;
+    padding: 0.8em 1em;
+    margin: 0.5em 0;
+  }
+
+  .reveal .ok-box {
+    background: #ecfdf5;
+    border: 2px solid var(--accent-500);
+    border-radius: 12px;
+    padding: 0.8em 1em;
+    margin: 0.5em 0;
+  }
+
+  .reveal .diagram {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.55em;
+    text-align: left;
+    background: var(--slate-800);
+    color: var(--slate-100);
+    padding: 1em;
+    border-radius: 8px;
+    line-height: 1.6;
+  }
+  .reveal .diagram .em-green { color: var(--accent-400); }
+  .reveal .diagram .em-red { color: #fca5a5; }
+
+  .reveal table {
+    border-collapse: collapse;
+    margin: 0 auto;
+  }
+  .reveal table th {
+    background: var(--slate-800);
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: none;
+    font-size: 0.85em;
+    letter-spacing: 0.03em;
+    padding: 0.6em 1em;
+  }
+  .reveal table td {
+    padding: 0.5em 1em;
+    border-bottom: 1px solid var(--slate-200);
+    color: var(--slate-700);
+  }
+  .reveal table tr:nth-child(even) td {
+    background: var(--slate-50);
+  }
+
+  .reveal .title-accent {
+    color: var(--accent-500);
+    font-weight: 700;
+  }
+
+  .reveal .subtitle {
+    color: var(--slate-500);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .reveal .progress span {
+    background: var(--accent-500);
+  }
+
+  .reveal .controls {
+    display: none !important;
+  }
+
+  .compass-nav {
+    position: fixed;
+    bottom: 2.5em;
+    right: 2em;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    font-family: 'EB Garamond', serif;
+    font-size: 1.5em;
+    font-weight: 700;
+  }
+
+  .compass-nav .direction {
+    position: absolute;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-500);
+    opacity: 0.3;
+    transition: opacity 0.3s ease, color 0.2s ease, transform 0.2s ease;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .compass-nav .direction.enabled {
+    opacity: 0.7;
+    color: var(--accent-600);
+    pointer-events: auto;
+  }
+
+  .compass-nav:hover .direction.enabled {
+    opacity: 1;
+  }
+
+  .compass-nav .direction.enabled:hover {
+    color: var(--accent-700);
+  }
+
+  .compass-nav .direction.enabled:hover span {
+    transform: scale(1.3);
+  }
+
+  @keyframes compass-shrink {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(0.7); }
+    100% { transform: scale(1); }
+  }
+
+  .compass-nav .direction.enabled:active span {
+    transform: scale(0.7);
+  }
+
+  .compass-nav .direction.clicked span {
+    animation: compass-shrink 0.25s ease-out forwards;
+  }
+
+  .compass-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 36px;
+    height: 36px;
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+  }
+
+  .compass-nav:hover .compass-logo {
+    opacity: 0.6;
+  }
+
+  .compass-logo svg {
+    width: 100%;
+    height: 100%;
+    fill: var(--accent-500);
+  }
+
+  .compass-nav .north { top: 0; left: 50%; transform: translateX(-50%); }
+  .compass-nav .south { bottom: 0; left: 50%; transform: translateX(-50%); }
+  .compass-nav .west { left: 0; top: 50%; transform: translateY(-50%); }
+  .compass-nav .east { right: 0; top: 50%; transform: translateY(-50%); }
+
+  @media (max-width: 768px) {
+    .compass-nav {
+      bottom: 2.5em;
+      right: 50%;
+      transform: translateX(50%);
+    }
+  }
+
+  .slide-footer {
+    position: fixed;
+    bottom: 1em;
+    left: 1.5em;
+    right: 1.5em;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Kode Mono', monospace;
+    font-size: 0.75em;
+    color: var(--slate-400);
+    z-index: 100;
+    pointer-events: none;
+  }
+  .slide-footer a {
+    color: var(--slate-400);
+    text-decoration: none;
+    pointer-events: auto;
+  }
+  .slide-footer a:hover {
+    color: var(--accent-500);
+  }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================================ -->
+<!-- TITLE -->
+<!-- ============================================================ -->
+<section>
+  <h1>How to <span class="title-accent">nuke!</span> your web services</span></h1>
+  <h3 class="subtitle">An introduction to <i>load testing</i> with k6</h3>
+  <p class="small" style="margin-top: 2em;">
+    <strong>skg.js meetup</strong> @ okThess<br/>
+    <strong>25.04.2026</strong>
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHOAMI -->
+<!-- ============================================================ -->
+<section>
+  <h2><svg xmlns="http://www.w3.org/2000/svg" viewBox="234.464 236.489 199.028 183.621" style="width: 0.8em; height: 0.8em; vertical-align: middle; display: inline-block; fill: var(--slate-800); margin-right: 0.15em;"><path d="M418.85 271.06c-6.12-11.03-14.83-20.59-25.22-27.45-.29-.19-.57-.37-.84-.46-.47-.37-.93-.65-1.4-.93a40.868 40.868 0 00-5.09-2.88c-.1-.09-.19-.09-.29-.09-1.02-.37-2.03-.74-3.06-.93-.54-.18-1.11-.27-1.66-.37-.83-.18-1.57-.28-2.41-.37-.66-.09-1.4-.09-2.05-.09-.83 0-1.67 0-2.49.09-12.63 1.3-22.55 11.87-22.55 24.86 0 2.32.37 4.54.93 6.68.28.83.55 1.67.83 2.41.09.09.09.28.19.37.47.93.92 1.85 1.39 2.69.19.46.46.93.74 1.39.09.09.19.19.29.37.27.37.45.74.74 1.02.37.46.74.93 1.11 1.39 1.48 2.04 3.05 3.62 4.82 5.2 4.82 4.73 9.46 9.27 13.73 14.37 4.17 5.01 8.16 10.58 10.57 17.16 2.5 6.4 3.24 13.63 2.78 20.87-.92 14.28-7.7 29.03-19.29 40.07-11.6 11.03-27.63 18.08-44.52 19.2-16.88 1.11-34.5-2.79-48.97-12.62-14.66-9.46-25.97-24.39-30.61-41.74-4.55-17.34-2.6-36.72 6.49-52.95 8.82-16.33 24.02-29.22 41.66-36.36.26-.19.45-.47.37-.84-.11-.37-.48-.55-.85-.37-18.27 6.03-35.05 18.09-45.63 34.88-5.38 8.34-9.37 17.62-11.49 27.54a84.81 84.81 0 00-.47 30.24c3.62 20.12 15.02 38.95 31.25 52.12 16.14 13.45 37.19 20.78 58.54 21.52 21.41.74 43.39-5.47 62.03-18.09 18.55-12.52 33.3-32.46 39.15-55.83 2.96-11.69 3.61-23.93 2.22-36.27-1.48-12.24-4.82-24.67-10.94-35.8z"/></svg> whoami</h2>
+  <div style="display: flex; align-items: flex-start; gap: 2em; text-align: left;">
+    <div style="flex: 1;">
+      <h3 style="margin-bottom: 0.2em;">Apostolos Kalovelonis</h3>
+      <p style="margin-top: 0; color: var(--accent-600); font-size: 0.8em;">Fintech Software Engineer</p>
+      <ul style="font-size: 0.55em; margin-top: 0.8em;">
+        <li><strong>Now</strong>; Sr. SWE (Wealthtech, UAE) | Founding SWE (Web3, EU) </li>
+        <li><strong>Previously</strong>; SWE (Custodial crypto, UK) </li>
+        <li><strong>Back then</strong>; Full-stack SWE (Blockchain / Open banking, EU) </li>
+        <li><strong>Stack</strong>; Node.js, TypeScript, DDD </li>
+      </ul>
+      <p style="font-size: 0.5em; margin-top: 1em; color: var(--slate-500);">
+        <strong>kalovelo.com</strong> &nbsp;|&nbsp; @kalovelo &nbsp;|&nbsp; /in/kalovelo
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- AGENDA -->
+<!-- ============================================================ -->
+<section>
+  <h2>Agenda</h2>
+  <ol style="font-size: 0.8em; line-height: 1.4;">
+    <li>Why load testing?</li>
+    <li>Beyond finding bugs; getting buy-in</li>
+    <li>What is k6?</li>
+    <li>The demo app; SplitDumb</li>
+    <li>The bugs we planted</li>
+    <li>Writing k6 tests</li>
+    <li>Live demos</li>
+    <li>Takeaways</li>
+  </ol>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHY LOAD TESTING -->
+<!-- ============================================================ -->
+<section>
+  <section>
+    <h2>Why Load Testing?</h2>
+    <p class="fragment">Unit tests check <em>correctness</em> of isolated components</p>
+    <p class="fragment">E2E tests check <em>behavior</em> from the user's perspective</p>
+    <p class="fragment">Load tests check <em>performance &amp; stability</em> under high traffic</p>
+    <p class="fragment" style="margin-top: 1em;">
+      Some bugs <strong>only appear</strong> when multiple users hit your app at the same time
+    </p>
+  </section>
+  <section>
+    <h2>What can go wrong?</h2>
+    <ul>
+      <li class="fragment"><span class="highlight-red">Race conditions</span>; concurrent writes corrupt data</li>
+      <li class="fragment"><span class="highlight-red">Resource exhaustion</span>; connection pools, memory, file descriptors</li>
+      <li class="fragment"><span class="highlight-red">Slow pages</span>; acceptable at 1 user, unusable at 100</li>
+      <li class="fragment"><span class="highlight-red">Cascading failures</span>; one slow query blocks everything</li>
+    </ul>
+  </section>
+  <section>
+    <h2>Beyond finding bugs</h2>
+    <p style="margin-bottom: 0.8em; font-size: 0.85em;">Load testing is also a <em>communication tool</em></p>
+    <ul style="font-size: 0.78em;">
+      <li class="fragment"><strong>Expose weak spots</strong>; show exactly where the system breaks, not just guess</li>
+      <li class="fragment"><strong>Generate proof</strong>; dashboards, metrics and failing thresholds are hard to argue with</li>
+      <li class="fragment"><strong>Get stakeholder buy-in</strong>; turn "we should fix this someday" into "we need to fix this now"</li>
+      <li class="fragment"><strong>Prioritize tech debt</strong>; data-driven arguments win budget and sprint time</li>
+    </ul>
+  </section>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHAT IS K6 -->
+<!-- ============================================================ -->
+<section>
+  <section>
+    <h2>What is k6?</h2>
+    <ul>
+      <li class="fragment">Open-source load testing tool by <strong>Grafana Labs</strong></li>
+      <li class="fragment">Write tests in <strong>JavaScript</strong></li>
+      <li class="fragment">Runs in <strong>Go</strong>; very efficient</li>
+      <li class="fragment">Built-in <strong>browser module</strong> (Chromium)</li>
+      <li class="fragment">CLI-first, CI/CD friendly</li>
+    </ul>
+  </section>
+  <section>
+    <h2>k6 vs Others</h2>
+    <table style="font-size: 0.6em;">
+      <thead>
+        <tr><th></th><th>k6</th><th>JMeter</th><th>Locust</th><th>Playwright</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Language</td><td>JS</td><td>XML/GUI</td><td>Python</td><td>JS/TS/Py</td></tr>
+        <tr><td>Protocol load</td><td class="highlight-green">Yes</td><td class="highlight-green">Yes</td><td class="highlight-green">Yes</td><td class="highlight-red">No</td></tr>
+        <tr><td>Real browser</td><td class="highlight-green">Yes</td><td class="highlight-red">No</td><td class="highlight-red">No</td><td class="highlight-green">Yes</td></tr>
+        <tr><td>Lightweight</td><td class="highlight-green">Yes</td><td class="highlight-red">No</td><td class="highlight-green">Yes</td><td class="highlight-amber">Medium</td></tr>
+      </tbody>
+    </table>
+  </section>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE APP -->
+<!-- ============================================================ -->
+<section>
+  <section>
+    <h2>The Demo App: <span class="title-accent">SplitDumb</span></h2>
+    <p>A Splitwise-like expense splitting app</p>
+    <div class="two-col" style="margin-top: 1em;">
+      <div>
+        <h4>Backend</h4>
+        <ul class="small">
+          <li>Express.js + PostgreSQL</li>
+          <li>REST API</li>
+          <li>Connection pool: <code>max: 2</code></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Frontend</h4>
+        <ul class="small">
+          <li>Next.js</li>
+          <li>Users, Groups, Expenses</li>
+          <li>Wallet (pay/top-up)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <section>
+    <h2>Architecture</h2>
+    <div class="diagram">
+&nbsp; Browser (Next.js :3001)
+&nbsp;     |
+&nbsp;     v
+&nbsp; Express API (:3000)
+&nbsp;     |
+&nbsp;     v
+&nbsp; PostgreSQL (:5432)
+&nbsp;   Pool: max=<span class="em-red">2</span>  &lt;-- intentionally small!
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE BUGS -->
+<!-- ============================================================ -->
+<section>
+  <section>
+    <h2>The Planted Bugs</h2>
+    <p>Two <em>intentional</em> bugs that only surface under load</p>
+  </section>
+  <section>
+    <h2>Bug 1: <span class="highlight-red">Race Condition</span></h2>
+    <p>The <code>/pay</code> endpoint uses read-then-write</p>
+    <pre><code class="javascript" data-trim data-noescape>
+// Step 1: Read current balance
+const user = await pool.query(
+  "SELECT balance FROM users WHERE id = $1", [id]
+);
+const currentBalance = parseFloat(user.rows[0].balance);
+
+// Step 2: Simulate async work (payment gateway)
+await new Promise(resolve => setTimeout(resolve, 50));
+
+// Step 3: Write new balance based on STALE read
+const newBalance = currentBalance - amount;
+await pool.query(
+  "UPDATE users SET balance = $1 WHERE id = $2",
+  [newBalance, id]
+);
+    </code></pre>
+  </section>
+  <section>
+    <h2>The Lost Update Problem</h2>
+    <div class="diagram">
+  Balance = $1000
+
+  VU-1: READ  balance &rarr; $1000
+  VU-2: READ  balance &rarr; $1000    <span class="em-red">(stale!)</span>
+  VU-1: WRITE balance = $1000 - $10 = <span class="em-green">$990</span>
+  VU-2: WRITE balance = $1000 - $10 = <span class="em-red">$990  (overwrites VU-1!)</span>
+
+  Expected: $980 &nbsp;|&nbsp; Actual: <span class="em-red">$990</span>
+  <span class="em-red">$10 appeared out of thin air!</span>
+    </div>
+  </section>
+  <section>
+    <h2>Bug 2: <span class="highlight-red">Pool Exhaustion</span></h2>
+    <div class="two-col">
+      <div>
+        <pre><code class="javascript" data-trim>
+// db.js
+const pool = new Pool({
+  max: 2,  // only 2 connections!
+  connectionTimeoutMillis: 2000,
+});
+        </code></pre>
+      </div>
+      <div>
+        <ul class="small" style="margin-top: 0.5em;">
+          <li>Pool allows only <strong>2</strong> concurrent connections</li>
+          <li>Each <code>/pay</code> holds a connection for ~50ms</li>
+          <li>10 concurrent users = 8 waiting</li>
+          <li>After 2s timeout &rarr; <strong>500 errors</strong></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================ -->
+<!-- K6 BASICS -->
+<!-- ============================================================ -->
+<section>
+  <section>
+    <h2>k6 Concepts</h2>
+    <ul>
+      <li class="fragment"><strong>VUs</strong> (Virtual Users); concurrent simulated users</li>
+      <li class="fragment"><strong>Scenarios</strong>; different load patterns</li>
+      <li class="fragment"><strong>Executors</strong>; how to schedule VUs</li>
+      <li class="fragment"><strong>Thresholds</strong>; pass/fail criteria</li>
+      <li class="fragment"><strong>Checks</strong>; assertions on responses</li>
+    </ul>
+  </section>
+  <section>
+    <h2>Minimal Example</h2>
+    <pre><code class="javascript" data-trim>
+import http from 'k6/http';
+import { check } from 'k6';
+
+export const options = {
+  vus: 10,
+  duration: '30s',
+};
+
+export default function () {
+  const res = http.get('http://localhost:3000/api/users');
+  check(res, {
+    'status is 200': (r) => r.status === 200,
+  });
+}
+    </code></pre>
+  </section>
+  <section>
+    <h2>Browser Module</h2>
+    <pre><code class="javascript" data-trim>
+import { browser } from 'k6/browser';
+
+export const options = {
+  scenarios: {
+    ui: {
+      executor: 'per-vu-iterations',
+      vus: 5,
+      iterations: 3,
+      exec: 'uiTest',
+      options: { browser: { type: 'chromium' } },
+    },
+  },
+};
+
+export async function uiTest() {
+  const page = await browser.newPage();
+  await page.goto('http://localhost:3001/');
+  // interact with the page like a real user
+  await page.close();
+}
+    </code></pre>
+  </section>
+</section>
+
+<!-- ============================================================ -->
+<!-- OUR TEST SCENARIOS -->
+<!-- ============================================================ -->
+<section>
+  <section>
+    <h2>Our Test Scenarios</h2>
+    <table style="font-size: 0.55em;">
+      <thead>
+        <tr><th>Scenario</th><th>What</th><th>VUs</th><th>Goal</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>browse</code></td>
+          <td>Navigate pages</td>
+          <td>1&rarr;5</td>
+          <td>Baseline performance</td>
+        </tr>
+        <tr>
+          <td><code>expenses</code></td>
+          <td>Create expenses via UI</td>
+          <td>3</td>
+          <td>Form submission under load</td>
+        </tr>
+        <tr>
+          <td><code class="highlight-red">race</code></td>
+          <td>Concurrent payments</td>
+          <td>10</td>
+          <td>Expose lost updates</td>
+        </tr>
+        <tr>
+          <td><code class="highlight-red">pool</code></td>
+          <td>Rapid-fire requests</td>
+          <td>1&rarr;10</td>
+          <td>Exhaust connection pool</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section>
+    <h2>Race Condition Test</h2>
+    <pre><code class="javascript" data-trim>
+// 10 VUs x 10 iterations = 100 payments of $10
+// Starting balance: $1000
+// Expected final balance: $0
+
+export async function raceCondition(data) {
+  const page = await browser.newPage();
+  await page.goto(`${BASE_URL}/users/${user.id}/wallet`);
+
+  const payInput = page.locator('[data-testid="pay-amount"]');
+  const payBtn = page.locator('[data-testid="pay-btn"]');
+
+  await payInput.fill('10');
+  await payBtn.click();
+
+  await page.close();
+}
+    </code></pre>
+  </section>
+  <section>
+    <h2>Thresholds</h2>
+    <pre><code class="javascript" data-trim>
+thresholds: {
+  // Performance
+  page_load_duration: ['p(95)<3000'],
+  custom_errors: ['count<50'],
+
+  // These WILL fail -- proving the bugs!
+  race_condition_drift: ['count==0'],
+  pool_exhaustion_errors: ['count==0'],
+}
+    </code></pre>
+    <p class="fragment">Thresholds make k6 tests <strong>CI/CD-friendly</strong><br/>
+    non-zero exit code on failure</p>
+  </section>
+</section>
+
+<!-- ============================================================ -->
+<!-- DEMO -->
+<!-- ============================================================ -->
+<section>
+  <h2>Demo Time</h2>
+  <pre><code class="bash" data-trim>
+npm run test:browse     # browse pages
+npm run test:expenses   # create expenses
+npm run test:race       # race condition
+npm run test:pool       # pool exhaustion
+  </code></pre>
+</section>
+
+<!-- ============================================================ -->
+<!-- RESULTS - RACE CONDITION -->
+<!-- ============================================================ -->
+<section>
+  <section>
+    <h2>Expected Results: Race Condition</h2>
+    <div class="bug-box">
+      <pre style="margin: 0; font-size: 0.9em; border: none;"><code data-trim class="text">
+=== RACE CONDITION RESULTS ===
+Starting balance: $1000
+Expected payments: 100 x $10 = $1000
+Expected final balance: $0
+Actual final balance:   $???
+Drift (lost money):     $???
+BUG: $$$ was "created" due to lost updates!
+==============================
+      </code></pre>
+    </div>
+    <p class="fragment" style="margin-top: 0.5em;">Money appeared out of thin air; <br/>a real financial bug hiding in plain sight</p>
+  </section>
+  <section>
+    <h2>The Fix</h2>
+    <div class="two-col">
+      <div>
+        <p class="highlight-red" style="font-size: 0.8em;">Before (non-atomic)</p>
+        <pre><code class="sql" data-trim>
+SELECT balance FROM users
+  WHERE id = $1;
+-- app calculates new balance
+UPDATE users
+  SET balance = $newBal
+  WHERE id = $1;
+        </code></pre>
+      </div>
+      <div>
+        <p class="highlight-green" style="font-size: 0.8em;">After (atomic)</p>
+        <pre><code class="sql" data-trim>
+UPDATE users
+  SET balance = balance - $1
+  WHERE id = $2
+  AND balance >= $1
+  RETURNING balance;
+        </code></pre>
+      </div>
+    </div>
+    <p class="fragment small" style="margin-top: 1em;">Or use: <code>SELECT ... FOR UPDATE</code>, optimistic locking, serializable transactions</p>
+  </section>
+</section>
+
+<!-- ============================================================ -->
+<!-- RESULTS - POOL EXHAUSTION -->
+<!-- ============================================================ -->
+<section>
+  <section>
+    <h2>Expected Results: Pool Exhaustion</h2>
+    <div class="bug-box">
+      <p>With <code>max: 2</code> connections and 10 concurrent VUs:</p>
+      <ul class="small">
+        <li>8 VUs wait for a free connection</li>
+        <li>After 2 seconds &rarr; timeout &rarr; <strong>500 error</strong></li>
+        <li>Users see errors on the page</li>
+      </ul>
+    </div>
+  </section>
+  <section>
+    <h2>The Fix</h2>
+    <div class="ok-box">
+      <pre style="margin: 0; border: none;"><code class="javascript" data-trim>
+const pool = new Pool({
+  max: 20,  // sensible default
+  connectionTimeoutMillis: 5000,
+  idleTimeoutMillis: 30000,
+});
+      </code></pre>
+    </div>
+  </section>
+</section>
+
+<!-- ============================================================ -->
+<!-- TAKEAWAYS -->
+<!-- ============================================================ -->
+<section>
+  <h2>Takeaways</h2>
+  <ul>
+    <li class="fragment"><strong>Load tests find bugs unit tests can't</strong><br/>
+      <span class="small">Race conditions & resource limits only surface under concurrency</span></li>
+    <li class="fragment"><strong>k6 makes it approachable</strong><br/>
+      <span class="small">JavaScript, browser support, great CLI output</span></li>
+    <li class="fragment"><strong>Thresholds make it automatable</strong><br/>
+      <span class="small">Add to CI/CD; fail the build if p95 > 3s</span></li>
+    <li class="fragment"><strong>Test the things that scare you</strong><br/>
+      <span class="small">Payments, auth, shared resources; load test them first</span></li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<!-- QUESTIONS -->
+<!-- ============================================================ -->
+<section>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="234.464 236.489 199.028 183.621" style="width: 1em; height: 1em; fill: var(--slate-300); display: block; margin: 0 auto 1em;"><path d="M418.85 271.06c-6.12-11.03-14.83-20.59-25.22-27.45-.29-.19-.57-.37-.84-.46-.47-.37-.93-.65-1.4-.93a40.868 40.868 0 00-5.09-2.88c-.1-.09-.19-.09-.29-.09-1.02-.37-2.03-.74-3.06-.93-.54-.18-1.11-.27-1.66-.37-.83-.18-1.57-.28-2.41-.37-.66-.09-1.4-.09-2.05-.09-.83 0-1.67 0-2.49.09-12.63 1.3-22.55 11.87-22.55 24.86 0 2.32.37 4.54.93 6.68.28.83.55 1.67.83 2.41.09.09.09.28.19.37.47.93.92 1.85 1.39 2.69.19.46.46.93.74 1.39.09.09.19.19.29.37.27.37.45.74.74 1.02.37.46.74.93 1.11 1.39 1.48 2.04 3.05 3.62 4.82 5.2 4.82 4.73 9.46 9.27 13.73 14.37 4.17 5.01 8.16 10.58 10.57 17.16 2.5 6.4 3.24 13.63 2.78 20.87-.92 14.28-7.7 29.03-19.29 40.07-11.6 11.03-27.63 18.08-44.52 19.2-16.88 1.11-34.5-2.79-48.97-12.62-14.66-9.46-25.97-24.39-30.61-41.74-4.55-17.34-2.6-36.72 6.49-52.95 8.82-16.33 24.02-29.22 41.66-36.36.26-.19.45-.47.37-.84-.11-.37-.48-.55-.85-.37-18.27 6.03-35.05 18.09-45.63 34.88-5.38 8.34-9.37 17.62-11.49 27.54a84.81 84.81 0 00-.47 30.24c3.62 20.12 15.02 38.95 31.25 52.12 16.14 13.45 37.19 20.78 58.54 21.52 21.41.74 43.39-5.47 62.03-18.09 18.55-12.52 33.3-32.46 39.15-55.83 2.96-11.69 3.61-23.93 2.22-36.27-1.48-12.24-4.82-24.67-10.94-35.8z"/></svg>
+  <h1>Questions?</h1>
+  <hr style="border: none; border-top: 1px solid var(--slate-200); margin: 1.5em auto; width: 40%;" />
+    <p style="font-size: 0.75em; color: var(--slate-500); margin-bottom: 0.5em;">Thank you! let's connect</p>
+  <p class="small" style="line-height: 2;">
+    <a href="https://www.linkedin.com/in/kalovelo/" target="_blank" style="color: var(--accent-600); text-decoration: none;">linkedin.com/in/kalovelo</a><br/>
+    <a href="https://github.com/Kalovelo" target="_blank" style="color: var(--accent-600); text-decoration: none;">github.com/kalovelo</a><br/>
+    <a href="https://kalovelo.com/" target="_blank" style="color: var(--accent-600); text-decoration: none;">kalovelo.com</a><br/>
+  </p>
+</section>
+
+</div>
+</div>
+
+<div class="slide-footer">
+  <span>Apostolos Kalovelonis</span>
+  <a href="https://kalovelo.com" target="_blank">kalovelo.com</a>
+</div>
+
+<div class="compass-nav">
+  <div class="compass-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="234.464 236.489 199.028 183.621"><path d="M418.85 271.06c-6.12-11.03-14.83-20.59-25.22-27.45-.29-.19-.57-.37-.84-.46-.47-.37-.93-.65-1.4-.93a40.868 40.868 0 00-5.09-2.88c-.1-.09-.19-.09-.29-.09-1.02-.37-2.03-.74-3.06-.93-.54-.18-1.11-.27-1.66-.37-.83-.18-1.57-.28-2.41-.37-.66-.09-1.4-.09-2.05-.09-.83 0-1.67 0-2.49.09-12.63 1.3-22.55 11.87-22.55 24.86 0 2.32.37 4.54.93 6.68.28.83.55 1.67.83 2.41.09.09.09.28.19.37.47.93.92 1.85 1.39 2.69.19.46.46.93.74 1.39.09.09.19.19.29.37.27.37.45.74.74 1.02.37.46.74.93 1.11 1.39 1.48 2.04 3.05 3.62 4.82 5.2 4.82 4.73 9.46 9.27 13.73 14.37 4.17 5.01 8.16 10.58 10.57 17.16 2.5 6.4 3.24 13.63 2.78 20.87-.92 14.28-7.7 29.03-19.29 40.07-11.6 11.03-27.63 18.08-44.52 19.2-16.88 1.11-34.5-2.79-48.97-12.62-14.66-9.46-25.97-24.39-30.61-41.74-4.55-17.34-2.6-36.72 6.49-52.95 8.82-16.33 24.02-29.22 41.66-36.36.26-.19.45-.47.37-.84-.11-.37-.48-.55-.85-.37-18.27 6.03-35.05 18.09-45.63 34.88-5.38 8.34-9.37 17.62-11.49 27.54a84.81 84.81 0 00-.47 30.24c3.62 20.12 15.02 38.95 31.25 52.12 16.14 13.45 37.19 20.78 58.54 21.52 21.41.74 43.39-5.47 62.03-18.09 18.55-12.52 33.3-32.46 39.15-55.83 2.96-11.69 3.61-23.93 2.22-36.27-1.48-12.24-4.82-24.67-10.94-35.8z"/></svg></div>
+  <div class="direction north" data-action="prev-vertical" title="Previous (N)"><span>N</span></div>
+  <div class="direction south" data-action="next-vertical" title="Next (S)"><span>S</span></div>
+  <div class="direction west" data-action="prev" title="Previous (W)"><span>W</span></div>
+  <div class="direction east" data-action="next" title="Next (E)"><span>E</span></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script>
+// Compass navigation
+const compassDirs = {
+  north: document.querySelector('.compass-nav .north'),
+  south: document.querySelector('.compass-nav .south'),
+  west:  document.querySelector('.compass-nav .west'),
+  east:  document.querySelector('.compass-nav .east'),
+};
+
+function updateCompass() {
+  const routes = Reveal.availableRoutes({ includeFragments: true });
+  const slide = Reveal.getCurrentSlide();
+  const pendingFragments = slide ? slide.querySelectorAll('.fragment:not(.disabled):not(.visible)').length : 0;
+  const visibleFragments = slide ? slide.querySelectorAll('.fragment:not(.disabled).visible').length : 0;
+  compassDirs.north.classList.toggle('enabled', !!routes.up);
+  compassDirs.south.classList.toggle('enabled', !!routes.down);
+  compassDirs.west.classList.toggle('enabled',  !!routes.left || visibleFragments > 0);
+  compassDirs.east.classList.toggle('enabled',  !!routes.right || pendingFragments > 0);
+}
+
+Reveal.initialize({
+  hash: true,
+  transition: 'slide',
+  plugins: [RevealHighlight],
+}).then(() => {
+  updateCompass();
+  Reveal.on('slidechanged', updateCompass);
+  Reveal.on('fragmentshown', updateCompass);
+  Reveal.on('fragmenthidden', updateCompass);
+});
+
+function animateDirection(dir) {
+  const el = compassDirs[dir];
+  if (!el) return;
+  el.classList.remove('clicked');
+  void el.offsetWidth;
+  el.classList.add('clicked');
+  const span = el.querySelector('span');
+  if (span) span.addEventListener('animationend', () => el.classList.remove('clicked'), { once: true });
+}
+
+document.querySelectorAll('.compass-nav .direction').forEach(el => {
+  el.addEventListener('click', () => {
+    const action = el.dataset.action;
+    if (action === 'next') Reveal.right();
+    else if (action === 'prev') Reveal.left();
+    else if (action === 'next-vertical') Reveal.down();
+    else if (action === 'prev-vertical') Reveal.up();
+  });
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') animateDirection('east');
+  else if (e.key === 'ArrowLeft') animateDirection('west');
+  else if (e.key === 'ArrowDown') animateDirection('south');
+  else if (e.key === 'ArrowUp') animateDirection('north');
+});
+</script>
+</body>
+</html>

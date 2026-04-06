@@ -1,0 +1,47 @@
+.header {
+  background: var(--primary);
+  color: #fff;
+  padding: 0 2rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.nav {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.nav a {
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.15s;
+}
+
+.nav a:hover {
+  color: #fff;
+}
+
+.seedBtn {
+  margin-left: auto;
+  background: #5cb85c;
+  color: #fff;
+  border: none;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.seedBtn:hover {
+  background: #4cae4c;
+}

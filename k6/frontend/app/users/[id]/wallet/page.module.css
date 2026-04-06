@@ -1,0 +1,80 @@
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.balance {
+  font-size: 1.2rem;
+  color: var(--gray);
+}
+
+.balance strong {
+  color: var(--primary);
+  font-size: 1.4rem;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.formRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.formRow input {
+  width: 120px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+.formRow button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.formRow button:hover {
+  background: var(--primary-light);
+}
+
+.payBtn {
+  background: var(--red, #e74c3c) !important;
+}
+
+.payBtn:hover {
+  opacity: 0.9;
+}
+
+.success {
+  color: var(--green, #27ae60);
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+.error {
+  color: var(--red, #e74c3c);
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+}
