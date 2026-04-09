@@ -713,11 +713,7 @@ export async function uiTest() {
   <section>
     <h2>Race Condition Test</h2>
     <pre><code class="javascript" data-trim>
-// 10 VUs x 10 iterations = 100 payments of $10
-// Starting balance: $1000
-// Expected final balance: $0
-
-export async function raceCondition(data) {
+export function raceCondition(data) {
   const page = await browser.newPage();
   await page.goto(`${BASE_URL}/users/${user.id}/wallet`);
 
@@ -730,6 +726,37 @@ export async function raceCondition(data) {
   await page.close();
 }
     </code></pre>
+    <p class="fragment">
+      <strong>100 payments of $10</strong> from a <strong>$1,000</strong> wallet<br/>
+      <span class="small" style="color: var(--slate-500);">Expected: <strong>$0</strong> &nbsp;·&nbsp; Actual: <span class="highlight-red">balance goes positive or payments silently succeed past zero</span></span>
+    </p>
+  </section>
+  <section>
+    <h2>Pool Exhaustion Test</h2>
+    <pre><code class="javascript" data-trim>
+export const options = {
+  scenarios: {
+    pool_exhaustion: {
+      executor: 'ramping-vus',
+      startVUs: 1,
+      stages: [
+        { duration: '5s',  target: 50  },
+        { duration: '15s', target: 100 },
+        { duration: '5s',  target: 0   },
+      ],
+      exec: 'poolExhaustion',
+    },
+  },
+};
+
+export function poolExhaustion(data) {
+  http.post(`${API_URL}/api/users/${user.id}/pay`, { amount: 1 });
+}
+    </code></pre>
+    <p class="fragment">
+      Ramps up to <strong>100 concurrent users</strong>, pool cap is <strong>2 connections</strong><br/>
+      <span class="small" style="color: var(--slate-500);">Expected: all payments succeed &nbsp;·&nbsp; Actual: <span class="highlight-red">requests time out &amp; fail as the pool saturates</span></span>
+    </p>
   </section>
   <section>
     <h2>Thresholds</h2>
@@ -753,7 +780,6 @@ thresholds: {
 <section>
   <h2>Demo Time</h2>
   <pre><code class="bash" data-trim>
-npm run test:browse     # browse pages
 npm run test:expenses   # create expenses
 npm run test:race       # race condition
 npm run test:pool       # pool exhaustion
@@ -768,16 +794,11 @@ npm run test:pool       # pool exhaustion
 <!-- TAKEAWAYS -->
 <!-- ============================================================ -->
 <section>
-  <h2>Takeaways</h2>
+  <h2>Load Testing Takeaways</h2>
   <ul>
-    <li class="fragment"><strong>Load tests find bugs unit tests can't</strong><br/>
-      <span class="small">Race conditions & resource limits only surface under concurrency</span></li>
-    <li class="fragment"><strong>k6 makes it approachable</strong><br/>
-      <span class="small">JavaScript, browser support, great CLI output</span></li>
-    <li class="fragment"><strong>Thresholds make it automatable</strong><br/>
-      <span class="small">Add to CI/CD; fail the build if p95 > 3s</span></li>
-    <li class="fragment"><strong>Test the things that scare you</strong><br/>
-      <span class="small">Payments, auth, shared resources; load test them first</span></li>
+    <li class="fragment"><strong>Finds bugs that other test types don't</strong><br/>
+    <li class="fragment"><strong>Can be a communication tool</strong><br/>
+    <li class="fragment"><strong>AI makes it more accessible than ever</strong><br/>
   </ul>
 </section>
 

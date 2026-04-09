@@ -6,7 +6,6 @@
     "build": "esbuild src/*.ts --bundle --format=esm --outdir=dist --sourcemap --external:k6 --external:k6/*",
     "typecheck": "tsc --noEmit",
     "test": "npm run build && K6_BROWSER_ENABLED=true K6_BROWSER_HEADLESS=false k6 run dist/load-test.js",
-    "test:browse": "npm run build && K6_BROWSER_ENABLED=true K6_BROWSER_HEADLESS=false k6 run dist/browse.js",
     "test:expenses": "npm run build && K6_BROWSER_ENABLED=true K6_BROWSER_HEADLESS=false k6 run dist/expenses.js",
     "test:race": "npm run build && K6_BROWSER_ENABLED=true K6_BROWSER_HEADLESS=false k6 run dist/race-condition.js",
     "test:pool": "npm run build && K6_BROWSER_ENABLED=true K6_BROWSER_HEADLESS=false k6 run dist/pool-exhaustion.js"
