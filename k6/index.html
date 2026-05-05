@@ -345,10 +345,12 @@
       transform: translateX(50%);
     }
     .slide-footer {
-      left: 1.2em;
-      right: 1.2em;
+      left: 0.3em;
+      right: 0.3em;
       justify-content: center;
       gap: 0;
+      white-space: nowrap;
+      overflow: hidden;
     }
     .slide-footer span::after {
       content: ' — ';
@@ -433,6 +435,15 @@
   [data-theme="dark"] .theme-toggle {
     color: var(--slate-300);
   }
+
+  #slideNum {
+    font-family: 'Kode Mono', monospace;
+    font-size: 1em;
+    color: var(--slate-400);
+  }
+  [data-theme="dark"] #slideNum {
+    color: var(--slate-500);
+  }
 </style>
 </head>
 <body>
@@ -448,7 +459,7 @@
   <h3 class="subtitle">An introduction to <i>load testing</i> with k6</h3>
   <p class="small" style="margin-top: 2em;">
     <strong>skg.js meetup</strong> @ okThess<br/>
-    <strong>25.04.2026</strong>
+    <strong>21.05.2026</strong>
   </p>
 </section>
 
@@ -481,7 +492,6 @@
   <h2>Agenda</h2>
   <ol style="font-size: 0.8em; line-height: 1.4;">
     <li>Why load testing?</li>
-    <li>Beyond finding bugs; getting buy-in</li>
     <li>What is k6?</li>
     <li>The demo app; SplitDumb</li>
     <li>The bugs we planted</li>
@@ -516,7 +526,7 @@
     <h2>Beyond finding bugs</h2>
     <p style="margin-bottom: 0.8em; font-size: 0.85em;">Load testing is also a <em>communication tool</em></p>
     <ul style="font-size: 0.78em;">
-      <li class="fragment"><strong>Expose weak spots</strong>; show exactly where the system breaks, not just guess</li>
+      <li class="fragment"><strong>Expose weak spots</strong>; show exactly where the system breaks</li>
       <li class="fragment"><strong>Generate proof</strong>; dashboards, metrics and failing thresholds are hard to argue with</li>
       <li class="fragment"><strong>Get stakeholder buy-in</strong>; turn "we should fix this someday" into "we need to fix this now"</li>
       <li class="fragment"><strong>Prioritize tech debt</strong>; data-driven arguments win budget and sprint time</li>
@@ -652,6 +662,9 @@ export default function () {
     </code></pre>
   </section>
   <section>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/JTdy1Y-46lU?si=w2V6cGgBFajphR7J" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </section>
+  <section>
     <h2>Browser Module</h2>
     <pre><code class="javascript" data-trim>
 import { browser } from 'k6/browser';
@@ -675,6 +688,9 @@ export async function uiTest() {
   await page.close();
 }
     </code></pre>
+  </section>
+  <section>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/OMrMkjUAGjk?si=CNFH-8vnqOPXXKzt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </section>
 </section>
 
@@ -791,10 +807,22 @@ npm run test:pool       # pool exhaustion
 <!-- ============================================================ -->
 <!-- ============================================================ -->
 <!-- ============================================================ -->
+<!-- OTHER TEST TYPES -->
+<!-- ============================================================ -->
+<section>
+  <h2>Other types of tests</h2>
+  <ul>
+    <li class="fragment"><strong>Soak test</strong>; sustained normal load for hours<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em;">memory leaks, connection drift, log/disk growth</span></li>
+    <li class="fragment"><strong>Stress test</strong>; push past capacity until the KA-BOOM<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em;">ceiling and how the system fails</span></li>
+    <li class="fragment"><strong>Spike test</strong>; burst of traffic, then drop<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em;">autoscaling, cold caches, recovery behavior</span></li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
 <!-- TAKEAWAYS -->
 <!-- ============================================================ -->
 <section>
-  <h2>Load Testing Takeaways</h2>
+  <h2>Takeaways</h2>
   <ul>
     <li class="fragment"><strong>Finds bugs that other test types don't</strong><br/>
     <li class="fragment"><strong>Can be a communication tool</strong><br/>
@@ -822,6 +850,7 @@ npm run test:pool       # pool exhaustion
 
 <div class="slide-footer">
   <span>A. Kalovelonis</span>
+  <span id="slideNum"></span>
   <a href="https://presentations.kalovelo.com" target="_blank">presentations.kalovelo.com</a>
 </div>
 
@@ -855,13 +884,26 @@ function updateCompass() {
   compassDirs.east.classList.toggle('enabled',  !!routes.right || pendingFragments > 0);
 }
 
+const slideNumEl = document.getElementById('slideNum');
+const hSections = document.querySelectorAll('.slides > section');
+const hTotal = hSections.length;
+
+function updateSlideNum() {
+  const { h, v } = Reveal.getIndices();
+  const hasVerticals = hSections[h] && hSections[h].querySelector('section') !== null;
+  const label = hasVerticals ? `${h + 1}${String.fromCharCode(97 + (v || 0))}` : `${h + 1}`;
+  slideNumEl.textContent = `${label}/${hTotal}`;
+}
+
 Reveal.initialize({
   hash: true,
   transition: 'slide',
   plugins: [RevealHighlight],
 }).then(() => {
   updateCompass();
+  updateSlideNum();
   Reveal.on('slidechanged', updateCompass);
+  Reveal.on('slidechanged', updateSlideNum);
   Reveal.on('fragmentshown', updateCompass);
   Reveal.on('fragmenthidden', updateCompass);
 });
