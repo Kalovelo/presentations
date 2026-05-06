@@ -225,7 +225,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--accent-500);
+    color: var(--slate-400);
     opacity: 0.3;
     transition: opacity 0.3s ease, color 0.2s ease, transform 0.2s ease;
     line-height: 1;
@@ -234,7 +234,7 @@
 
   .compass-nav .direction.enabled {
     opacity: 0.7;
-    color: var(--accent-600);
+    color: var(--slate-400);
     pointer-events: auto;
   }
 
@@ -243,7 +243,15 @@
   }
 
   .compass-nav .direction.enabled:hover {
-    color: var(--accent-700);
+    color: var(--accent-500);
+  }
+
+  [data-theme="dark"] .compass-nav .direction,
+  [data-theme="dark"] .compass-nav .direction.enabled {
+    color: var(--slate-500);
+  }
+  [data-theme="dark"] .compass-nav .direction.enabled:hover {
+    color: var(--accent-400);
   }
 
   .compass-nav .direction.enabled:hover span {
@@ -282,7 +290,10 @@
   .compass-logo svg {
     width: 100%;
     height: 100%;
-    fill: var(--accent-500);
+    fill: var(--slate-400);
+  }
+  [data-theme="dark"] .compass-logo svg {
+    fill: var(--slate-500);
   }
 
   .compass-nav .north { top: 0; left: 50%; transform: translateX(-50%); }
@@ -436,6 +447,27 @@
     color: var(--slate-300);
   }
 
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    cursor: zoom-out;
+    padding: 2em;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 0.5em;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+
   #slideNum {
     font-family: 'Kode Mono', monospace;
     font-size: 1em;
@@ -507,10 +539,10 @@
 <section>
   <section>
     <h2>Why Load Testing?</h2>
-    <p class="fragment">Unit tests check <em>correctness</em> of isolated components</p>
-    <p class="fragment">E2E tests check <em>behavior</em> from the user's perspective</p>
-    <p class="fragment">Load tests check <em>performance &amp; stability</em> under high traffic</p>
-    <p class="fragment" style="margin-top: 1em;">
+    <p>Unit tests check <em>correctness</em> of isolated components</p>
+    <p>E2E tests check <em>behavior</em> from the user's perspective</p>
+    <p>Load tests check <em>performance &amp; stability</em> under high traffic</p>
+    <p style="margin-top: 1em;">
       Some bugs <strong>only appear</strong> when multiple users hit your app at the same time
     </p>
   </section>
@@ -535,18 +567,36 @@
 </section>
 
 <!-- ============================================================ -->
-<!-- WHAT IS K6 -->
+<!-- TYPES OF LOAD TESTING -->
 <!-- ============================================================ -->
 <section>
   <section>
-    <h2>What is k6?</h2>
-    <ul>
-      <li class="fragment">Open-source load testing tool by <strong>Grafana Labs</strong></li>
-      <li class="fragment">Write tests in <strong>JavaScript</strong>, run in <strong>Go</strong></li>
-      <li class="fragment">Built-in <strong>browser module</strong> (Chromium)</li>
-      <li class="fragment">CLI-first, CI/CD friendly</li>
+    <h2>Types of load testing</h2>
+    <img src="images/load-test-types.png" alt="Load test types at a glance" class="zoomable" style="width: 100%; max-height: 85vh; background: #ffffff; border-radius: 8px; padding: 0.5em; cursor: zoom-in;" />
+  </section>
+  <section>
+    <h2>Types of load testing</h2>
+    <ul style="font-size: 0.75em; column-count: 2; column-gap: 2em; text-align: left;">
+      <li class="fragment" style="break-inside: avoid;"><strong>Average load</strong>; expected production traffic<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">baseline performance under normal use</span></li>
+      <li class="fragment" style="break-inside: avoid;"><strong>Stress test</strong>; above-average load, sustained<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">behavior at the edge of capacity</span></li>
+      <li class="fragment" style="break-inside: avoid;"><strong>Soak test</strong>; sustained normal load for hours<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">memory leaks, connection drift, log/disk growth</span></li>
+      <li class="fragment" style="break-inside: avoid;"><strong>Breakpoint test</strong>; push past capacity until the KA-BOOM<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">ceiling and how the system fails</span></li>
+      <li class="fragment" style="break-inside: avoid;"><strong>Spike test</strong>; burst of traffic, then drop<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">autoscaling, cold caches, recovery behavior</span></li>
     </ul>
   </section>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHAT IS K6 -->
+<!-- ============================================================ -->
+<section>
+  <h2>What is k6?</h2>
+  <ul>
+    <li class="fragment">Open-source load testing tool by <strong>Grafana Labs</strong></li>
+    <li class="fragment">Write tests in <strong>JavaScript</strong>, run in <strong>Go</strong></li>
+    <li class="fragment">Built-in <strong>browser module</strong> (Chromium)</li>
+    <li class="fragment">CLI-first, CI/CD friendly</li>
+  </ul>
 </section>
 
 <!-- ============================================================ -->
@@ -794,55 +844,45 @@ thresholds: {
 <!-- DEMO -->
 <!-- ============================================================ -->
 <section>
-  <h2>Demo Time</h2>
-  <pre><code class="bash" data-trim>
+  <section>
+    <h2>Demo Time</h2>
+    <pre><code class="bash" data-trim>
 npm run test:expenses   # create expenses
 npm run test:race       # race condition
 npm run test:pool       # pool exhaustion
-  </code></pre>
-</section>
+    </code></pre>
+  </section>
 
-<section>
-  <h2>Submit expenses</h2>
-  <iframe width="960" height="540" src="https://www.youtube.com/embed/m9-LLMe5j7E?si=z0HZluA72nFeFdrt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</section>
+  <section>
+    <h2>Submit expenses</h2>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/m9-LLMe5j7E?si=z0HZluA72nFeFdrt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </section>
 
-<section>
-  <h2>Race condition</h2>
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/4KhrpbVXZqo?si=1qU3teVsUnB0-DEw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</section>
+  <section>
+    <h2>Race condition</h2>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/4KhrpbVXZqo?si=1qU3teVsUnB0-DEw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </section>
 
-<section>
-  <h2>Pool exhaustion</h2>
-  <iframe width="960" height="540" src="https://www.youtube.com/embed/91nEQ6gauvw?si=7R55tNShDR-i7DET" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  <section>
+    <h2>Pool exhaustion</h2>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/91nEQ6gauvw?si=7R55tNShDR-i7DET" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </section>
 </section>
 
 <!-- ============================================================ -->
 <!-- RESULTS - RACE CONDITION -->
 <!-- ============================================================ -->
 <!-- ============================================================ -->
-<!-- ============================================================ -->
-<!-- OTHER TEST TYPES -->
-<!-- ============================================================ -->
-<section>
-  <h2>Other types of tests</h2>
-  <ul>
-    <li class="fragment"><strong>Soak test</strong>; sustained normal load for hours<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em;">memory leaks, connection drift, log/disk growth</span></li>
-    <li class="fragment"><strong>Stress test</strong>; push past capacity until the KA-BOOM<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em;">ceiling and how the system fails</span></li>
-    <li class="fragment"><strong>Spike test</strong>; burst of traffic, then drop<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em;">autoscaling, cold caches, recovery behavior</span></li>
-  </ul>
-</section>
-
-<!-- ============================================================ -->
 <!-- TAKEAWAYS -->
 <!-- ============================================================ -->
 <section>
   <h2>Takeaways</h2>
-  <ul>
-    <li class="fragment"><strong>Finds issues that other test types don't</strong><br/>
-    <li class="fragment"><strong>Can be a communication tool</strong><br/>
-    <li class="fragment"><strong>AI makes it more accessible than ever</strong><br/>
-  </ul>
+  <ol>
+    <li class="fragment">Finds <em>issues</em> that other tests don't</li>
+    <li class="fragment">Can be a <em>communication tool</em></li>
+    <li class="fragment">Write <em>.js</em> with <em>.go</em> efficiency</li>
+    <li class="fragment"><em>AI</em> makes it more accessible than ever</li>
+  </ol>
 </section>
 
 <!-- ============================================================ -->
@@ -876,6 +916,8 @@ npm run test:pool       # pool exhaustion
   <div class="direction west" data-action="prev" title="Previous (W)"><span>W</span></div>
   <div class="direction east" data-action="next" title="Next (E)"><span>E</span></div>
 </div>
+
+<div class="lightbox" id="lightbox"><img id="lightboxImg" src="" alt="" /></div>
 
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
@@ -964,6 +1006,20 @@ function applyTheme(theme) {
 }
 
 applyTheme(localStorage.getItem('theme') || 'light');
+
+// Image lightbox
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+document.querySelectorAll('img.zoomable').forEach(img => {
+  img.addEventListener('click', () => {
+    lightboxImg.src = img.src;
+    lightbox.classList.add('open');
+  });
+});
+lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') lightbox.classList.remove('open');
+});
 
 themeToggle.addEventListener('click', () => {
   const next = rootEl.dataset.theme === 'dark' ? 'light' : 'dark';
