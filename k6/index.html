@@ -539,29 +539,31 @@
 <section>
   <section>
     <h2>Why Load Testing?</h2>
-    <p>Unit tests check <em>correctness</em> of isolated components</p>
-    <p>E2E tests check <em>behavior</em> from the user's perspective</p>
-    <p>Load tests check <em>performance &amp; stability</em> under high traffic</p>
-    <p style="margin-top: 1em;">
+    <ul style="text-align: left;">
+      <li>- Unit tests check <em>correctness</em> of isolated components</li>
+      <li>- E2E tests check <em>behavior</em> from the user's perspective</li>
+      <li>- Load tests check <em>performance &amp; stability</em> under high traffic</li>
+    </ul>
+    <p style="margin-top: 1em; text-align: center;">
       Some bugs <strong>only appear</strong> when multiple users hit your app at the same time
     </p>
   </section>
   <section>
     <h2>What can go wrong?</h2>
-    <ul>
-      <li class="fragment"><span class="highlight-red">Race conditions</span>; concurrent writes corrupt data</li>
-      <li class="fragment"><span class="highlight-red">Resource exhaustion</span>; connection pools, memory, file descriptors</li>
-      <li class="fragment"><span class="highlight-red">Slow pages</span>; acceptable at 1 user, unusable at 100</li>
+    <ul style="text-align: left;">
+      <li class="fragment">- <span class="highlight-red">Race conditions</span>; concurrent writes corrupt data</li>
+      <li class="fragment">- <span class="highlight-red">Resource exhaustion</span>; connection pools, memory, file descriptors</li>
+      <li class="fragment">- <span class="highlight-red">Slow pages</span>; acceptable at 1 user, unusable at 100</li>
     </ul>
   </section>
   <section>
     <h2>Beyond finding bugs</h2>
     <p style="margin-bottom: 0.8em; font-size: 0.85em;">Load testing is also a <em>communication tool</em></p>
-    <ul style="font-size: 0.78em;">
-      <li class="fragment"><strong>Expose weak spots</strong>; show exactly where the system breaks</li>
-      <li class="fragment"><strong>Generate proof</strong>; dashboards, metrics and failing thresholds are hard to argue with</li>
-      <li class="fragment"><strong>Get stakeholder buy-in</strong>; "we should fix this someday" into "we need to fix this now"</li>
-      <li class="fragment"><strong>Prioritize tech debt</strong>; data-driven arguments win budget and sprint time</li>
+    <ul style="font-size: 0.78em; text-align: left;">
+      <li class="fragment">- <strong>Expose weak spots</strong>; show exactly where the system breaks</li>
+      <li class="fragment">- <strong>Generate proof</strong>; dashboards, metrics and failing thresholds are hard to argue with</li>
+      <li class="fragment">- <strong>Get stakeholder buy-in</strong>; "we should fix this someday" into "we need to fix this now"</li>
+      <li class="fragment">- <strong>Prioritize tech debt</strong>; data-driven arguments win budget and sprint time</li>
     </ul>
   </section>
 </section>
@@ -577,11 +579,11 @@
   <section>
     <h2>Types of load testing</h2>
     <ul style="font-size: 0.75em; column-count: 2; column-gap: 2em; text-align: left;">
-      <li class="fragment" style="break-inside: avoid;"><strong>Average load</strong>; expected production traffic<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">baseline performance under normal use</span></li>
-      <li class="fragment" style="break-inside: avoid;"><strong>Stress test</strong>; above-average load, sustained<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">behavior at the edge of capacity</span></li>
-      <li class="fragment" style="break-inside: avoid;"><strong>Soak test</strong>; sustained normal load for hours<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">memory leaks, connection drift, log/disk growth</span></li>
-      <li class="fragment" style="break-inside: avoid;"><strong>Breakpoint test</strong>; push past capacity until the KA-BOOM<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">ceiling and how the system fails</span></li>
-      <li class="fragment" style="break-inside: avoid;"><strong>Spike test</strong>; burst of traffic, then drop<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">autoscaling, cold caches, recovery behavior</span></li>
+      <li class="fragment" style="break-inside: avoid;">- <strong>Average load</strong>; expected production traffic<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">baseline performance under normal use</span></li>
+      <li class="fragment" style="break-inside: avoid;">- <strong>Stress test</strong>; above-average load, sustained<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">behavior at the edge of capacity</span></li>
+      <li class="fragment" style="break-inside: avoid;">- <strong>Soak test</strong>; sustained normal load for hours<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">memory leaks, connection drift, log/disk growth</span></li>
+      <li class="fragment" style="break-inside: avoid;">- <strong>Breakpoint test</strong>; push past capacity until the KA-BOOM<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">ceiling and how the system fails</span></li>
+      <li class="fragment" style="break-inside: avoid;">- <strong>Spike test</strong>; burst of traffic, then drop<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">autoscaling, cold caches, recovery behavior</span></li>
     </ul>
   </section>
 </section>
@@ -591,11 +593,11 @@
 <!-- ============================================================ -->
 <section>
   <h2>What is k6?</h2>
-  <ul>
-    <li class="fragment">Open-source load testing tool by <strong>Grafana Labs</strong></li>
-    <li class="fragment">Write tests in <strong>JavaScript</strong>, run in <strong>Go</strong></li>
-    <li class="fragment">Built-in <strong>browser module</strong> (Chromium)</li>
-    <li class="fragment">CLI-first, CI/CD friendly</li>
+  <ul style="text-align: left;">
+    <li class="fragment">- Open-source load testing tool by <strong>Grafana Labs</strong></li>
+    <li class="fragment">- Write tests in <strong>JavaScript</strong>, run in <strong>Go</strong></li>
+    <li class="fragment">- Built-in <strong>browser module</strong> (Chromium)</li>
+    <li class="fragment">- CLI-first, CI/CD friendly</li>
   </ul>
 </section>
 
@@ -684,12 +686,12 @@ const pool = new Pool({
 <section>
   <section>
     <h2>k6 Concepts</h2>
-    <ul>
-      <li class="fragment"><strong>VUs</strong> (Virtual Users); concurrent simulated users</li>
-      <li class="fragment"><strong>Scenarios</strong>; different load patterns</li>
-      <li class="fragment"><strong>Executors</strong>; how to schedule VUs</li>
-      <li class="fragment"><strong>Thresholds</strong>; pass/fail criteria</li>
-      <li class="fragment"><strong>Checks</strong>; assertions on responses</li>
+    <ul style="text-align: left;">
+      <li class="fragment">- <strong>VUs</strong> (Virtual Users); concurrent simulated users</li>
+      <li class="fragment">- <strong>Scenarios</strong>; different load patterns</li>
+      <li class="fragment">- <strong>Executors</strong>; how to schedule VUs</li>
+      <li class="fragment">- <strong>Thresholds</strong>; pass/fail criteria</li>
+      <li class="fragment">- <strong>Checks</strong>; assertions on responses</li>
     </ul>
   </section>
   <section>
