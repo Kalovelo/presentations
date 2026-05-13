@@ -381,9 +381,7 @@
       transform: translateX(-50%);
     }
     .compass-nav {
-      bottom: 2.5em;
-      right: 50%;
-      transform: translateX(50%);
+      display: none;
     }
     .slide-footer {
       left: 0.3em;
@@ -533,7 +531,7 @@
   <div style="display: flex; align-items: flex-start; gap: 2em; text-align: left;">
     <div style="flex: 1;">
       <h3 style="margin-bottom: 0.2em;">Apostolos Kalovelonis</h3>
-      <p style="margin-top: 0; color: var(--accent-600); font-size: 0.8em;">Fintech Software Engineer</p>
+      <p style="margin-top: 0; color: var(--accent-600); font-size: 0.8em;">Senior Fintech Software Engineer</p>
       <ul style="font-size: 0.55em; margin-top: 0.8em;margin-bottom: 0.8em">
         <li><strong>Now</strong>; Sr. SWE (Wealthtech, UAE) | Founding SWE (Web3, EU) </li>
         <li><strong>Previously</strong>; SWE (Custodial crypto, UK) </li>
@@ -570,7 +568,7 @@
       <li>- E2E tests check <em>behavior</em> from the user's perspective</li>
       <li>- Load tests check <em>performance &amp; stability</em> under high traffic</li>
     </ul>
-    <p style="margin-top: 1em; text-align: center;">
+    <p style="margin-top: 1em;">
       Some bugs <strong>only appear</strong> when multiple users hit your app at the same time
     </p>
   </section>
@@ -905,6 +903,7 @@ npm run test:pool       # pool exhaustion
     <div style="text-align: left;">
       <p style="font-size: 0.75em; color: var(--slate-500); margin: 0 0 0.5em 0;">Thank you! Let's connect</p>
       <p class="small" style="line-height: 2; margin: 0;">
+        <a href="https://kalovelo.com/" target="_blank" style="color: var(--accent-600); text-decoration: none;">presentations.kalovelo.com</a><br/>
         <a href="https://www.linkedin.com/in/kalovelo/" target="_blank" style="color: var(--accent-600); text-decoration: none;">linkedin.com/in/kalovelo</a><br/>
         <a href="https://github.com/Kalovelo" target="_blank" style="color: var(--accent-600); text-decoration: none;">github.com/kalovelo</a><br/>
         <a href="https://kalovelo.com/" target="_blank" style="color: var(--accent-600); text-decoration: none;">kalovelo.com</a>
@@ -912,7 +911,7 @@ npm run test:pool       # pool exhaustion
     </div>
     <div style="display: flex; flex-direction: column; align-items: center;">
       <div id="qr-deck" class="qr-deck"></div>
-      <p style="font-family: 'EB Garamond', serif; font-size: .7em; color: var(--slate-500); margin: 0.6em 0 0 0;">get the slides</p>
+      <p style="font-family: 'EB Garamond', serif; font-size: .7em; color: var(--slate-500); margin: 0.6em 0 0 0;">grab the slides</p>
     </div>
   </div>
 </section>
@@ -975,7 +974,7 @@ thresholds: {
     width: 240,
     height: 240,
     type: 'svg',
-    data: 'https://presentations.kalovelo.com/k6',
+    data: 'https://github.com/Kalovelo/presentations',
     image: logoUri,
     margin: 0,
     qrOptions: { errorCorrectionLevel: 'H' },
