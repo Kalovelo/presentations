@@ -4,7 +4,8 @@
   "description": "Splitdumb expense splitting app for k6 load testing demo",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
   "keywords": [],
   "license": "MIT",
@@ -12,5 +13,8 @@
     "cors": "^2.8.5",
     "express": "^4.21.0",
     "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }
