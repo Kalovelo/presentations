@@ -199,6 +199,10 @@
   .reveal table tr:nth-child(even) td {
     background: var(--slate-50);
   }
+  .reveal table.executors th,
+  .reveal table.executors td {
+    padding: 0.9em 1.4em;
+  }
 
   .qr-deck {
     padding: 0.9em;
@@ -583,11 +587,11 @@
   <section>
     <h2>Beyond finding bugs</h2>
     <p style="margin-bottom: 0.8em; font-size: 0.85em;">Load testing is also a <em>communication tool</em></p>
-    <ul style="font-size: 0.78em; text-align: left;">
-      <li class="fragment">- <strong>Expose weak spots</strong>; show exactly where the system breaks</li>
-      <li class="fragment">- <strong>Generate proof</strong>; dashboards, metrics and failing thresholds are hard to argue with</li>
-      <li class="fragment">- <strong>Get stakeholder buy-in</strong>; "we should fix this someday" into "we need to fix this now"</li>
-      <li class="fragment">- <strong>Prioritize tech debt</strong>; data-driven arguments win budget and sprint time</li>
+    <ul class="fragment" style="font-size: 0.78em; text-align: left;">
+      <li>- <strong>Expose weak spots</strong>; show exactly where the system breaks</li>
+      <li>- <strong>Generate proof</strong>; dashboards, metrics and failing thresholds are hard to argue with</li>
+      <li>- <strong>Get stakeholder buy-in</strong>; "we should fix this someday" into "we need to fix this now"</li>
+      <li>- <strong>Prioritize tech debt</strong>; data-driven arguments win budget and sprint time</li>
     </ul>
   </section>
 </section>
@@ -626,6 +630,69 @@
 </section>
 
 <!-- ============================================================ -->
+<!-- K6 BASICS -->
+<!-- ============================================================ -->
+<section>
+  <section>
+    <h2>Minimal Example</h2>
+    <pre><code class="javascript" data-trim>
+import http from 'k6/http';
+import { check } from 'k6';
+
+export const options = {
+  vus: 10,
+  duration: '30s',
+};
+
+export default function () {
+  const res = http.get('http://localhost:3000/api/users');
+  check(res, {
+    'status is 200': (r) => r.status === 200,
+  });
+}
+    </code></pre>
+  </section>
+  <section>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/JTdy1Y-46lU?si=w2V6cGgBFajphR7J&start=10" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </section>
+  <section>
+    <h2>Browser Module</h2>
+    <pre><code class="javascript" data-trim>
+import { browser } from 'k6/browser';
+
+export const options = {
+  scenarios: {
+    ui: {
+      executor: 'per-vu-iterations',
+      vus: 5,
+      iterations: 3,
+      exec: 'uiTest',
+      options: { browser: { type: 'chromium' } },
+    },
+  },
+};
+
+export async function uiTest() {
+  const page = await browser.newPage();
+  await page.goto('http://localhost:3001/');
+  // interact with the page like a real user
+  await page.close();
+}
+    </code></pre>
+  </section>
+  <section>
+    <h2>k6 Concepts</h2>
+    <ul style="text-align: left;">
+      <li>- <strong>VUs</strong> (Virtual Users); concurrent simulated users</li>
+      <li>- <strong>Scenarios</strong>; different load patterns</li>
+      <li>- <strong>Executors</strong>; how to schedule VUs</li>
+      <li>- <strong>Checks</strong>; unit-test like assertions </li>
+      <li>- <strong>Thresholds</strong>; pass/fail criteria <i>(!= 0 exit)</i></li>
+    </ul>
+  </section>
+</section>
+
+<!-- ============================================================ -->
 <!-- THE APP -->
 <!-- ============================================================ -->
 <section>
@@ -649,6 +716,93 @@
         </ul>
       </div>
     </div>
+  </section>
+  <section class="centered">
+    <h2>Demo time</h2>
+    <p style="font-size: 0.8em; color: var(--slate-500);">let's poke around</p>
+  </section>
+</section>
+
+<!-- ============================================================ -->
+<!-- OUR TEST SCENARIOS -->
+<!-- ============================================================ -->
+<section>
+  <section>
+    <h2>Our Test Scenarios</h2>
+    <table style="font-size: 0.55em;">
+      <thead>
+        <tr><th>Scenario</th><th>What</th><th>VUs</th><th>Goal</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>expenses</code></td>
+          <td>Create expenses via UI</td>
+          <td>3</td>
+          <td>Form submission under load</td>
+        </tr>
+        <tr>
+          <td><code class="highlight-red">race</code></td>
+          <td>Concurrent payments</td>
+          <td>10</td>
+          <td>Expose lost updates</td>
+        </tr>
+        <tr>
+          <td><code class="highlight-red">pool</code></td>
+          <td>Rapid-fire requests</td>
+          <td>1&rarr;10</td>
+          <td>Exhaust connection pool</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section>
+    <h2>Concurrent expenses</h2>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/m9-LLMe5j7E?si=z0HZluA72nFeFdrt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </section>
+  <section>
+    <h2>Race Condition Test</h2>
+    <pre><code class="javascript" data-trim>
+export function raceCondition(data) {
+  const page = await browser.newPage();
+  await page.goto(`${BASE_URL}/users/${user.id}/wallet`);
+
+  const payInput = page.locator('[data-testid="pay-amount"]');
+  const payBtn = page.locator('[data-testid="pay-btn"]');
+
+  await payInput.fill('10');
+  await payBtn.click();
+
+  await page.close();
+}
+    </code></pre>
+    <p class="fragment">
+      <strong>100 payments of $10</strong> from a <strong>$1,000</strong> wallet<br/>
+      <span class="small" style="color: var(--slate-500);">Expected: <strong>$0</strong> &nbsp;·&nbsp; Actual: <span class="highlight-red">balance goes positive or payments silently succeed past zero</span></span>
+    </p>
+  </section>
+  <section>
+    <h2>Race condition</h2>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/4KhrpbVXZqo?si=1qU3teVsUnB0-DEw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </section>
+  <section>
+    <h2>Pool Exhaustion Test</h2>
+    <pre><code class="javascript" data-trim>
+export const options = {
+  stages: [
+    { duration: '5s',  target: 50  },
+    { duration: '15s', target: 100 },
+    { duration: '5s',  target: 0   },
+  ],
+};
+
+export default function () {
+  http.post(`${API_URL}/api/users/${user.id}/pay`, { amount: 1 });
+}
+    </code></pre>
+  </section>
+  <section>
+    <h2>Pool exhaustion</h2>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/91nEQ6gauvw?si=7R55tNShDR-i7DET" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </section>
 </section>
 
@@ -704,183 +858,6 @@ const pool = new Pool({
 </section>
 
 <!-- ============================================================ -->
-<!-- K6 BASICS -->
-<!-- ============================================================ -->
-<section>
-  <section>
-    <h2>k6 Concepts</h2>
-    <ul style="text-align: left;">
-      <li>- <strong>VUs</strong> (Virtual Users); concurrent simulated users</li>
-      <li>- <strong>Scenarios</strong>; different load patterns</li>
-      <li>- <strong>Executors</strong>; how to schedule VUs</li>
-      <li>- <strong>Checks</strong>; unit-test like assertions </li>
-      <li>- <strong>Thresholds</strong>; pass/fail criteria <i>(!= 0 exit)</i></li>
-    </ul>
-  </section>
-  <section>
-    <h2>Minimal Example</h2>
-    <pre><code class="javascript" data-trim>
-import http from 'k6/http';
-import { check } from 'k6';
-
-export const options = {
-  vus: 10,
-  duration: '30s',
-};
-
-export default function () {
-  const res = http.get('http://localhost:3000/api/users');
-  check(res, {
-    'status is 200': (r) => r.status === 200,
-  });
-}
-    </code></pre>
-  </section>
-  <section>
-    <iframe width="960" height="540" src="https://www.youtube.com/embed/JTdy1Y-46lU?si=w2V6cGgBFajphR7J" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-  </section>
-  <section>
-    <h2>Browser Module</h2>
-    <pre><code class="javascript" data-trim>
-import { browser } from 'k6/browser';
-
-export const options = {
-  scenarios: {
-    ui: {
-      executor: 'per-vu-iterations',
-      vus: 5,
-      iterations: 3,
-      exec: 'uiTest',
-      options: { browser: { type: 'chromium' } },
-    },
-  },
-};
-
-export async function uiTest() {
-  const page = await browser.newPage();
-  await page.goto('http://localhost:3001/');
-  // interact with the page like a real user
-  await page.close();
-}
-    </code></pre>
-  </section>
-  <section>
-    <iframe width="960" height="540" src="https://www.youtube.com/embed/OMrMkjUAGjk?si=CNFH-8vnqOPXXKzt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-  </section>
-</section>
-
-<!-- ============================================================ -->
-<!-- OUR TEST SCENARIOS -->
-<!-- ============================================================ -->
-<section>
-  <section>
-    <h2>Our Test Scenarios</h2>
-    <table style="font-size: 0.55em;">
-      <thead>
-        <tr><th>Scenario</th><th>What</th><th>VUs</th><th>Goal</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>expenses</code></td>
-          <td>Create expenses via UI</td>
-          <td>3</td>
-          <td>Form submission under load</td>
-        </tr>
-        <tr>
-          <td><code class="highlight-red">race</code></td>
-          <td>Concurrent payments</td>
-          <td>10</td>
-          <td>Expose lost updates</td>
-        </tr>
-        <tr>
-          <td><code class="highlight-red">pool</code></td>
-          <td>Rapid-fire requests</td>
-          <td>1&rarr;10</td>
-          <td>Exhaust connection pool</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-  <section>
-    <h2>Race Condition Test</h2>
-    <pre><code class="javascript" data-trim>
-export function raceCondition(data) {
-  const page = await browser.newPage();
-  await page.goto(`${BASE_URL}/users/${user.id}/wallet`);
-
-  const payInput = page.locator('[data-testid="pay-amount"]');
-  const payBtn = page.locator('[data-testid="pay-btn"]');
-
-  await payInput.fill('10');
-  await payBtn.click();
-
-  await page.close();
-}
-    </code></pre>
-    <p class="fragment">
-      <strong>100 payments of $10</strong> from a <strong>$1,000</strong> wallet<br/>
-      <span class="small" style="color: var(--slate-500);">Expected: <strong>$0</strong> &nbsp;·&nbsp; Actual: <span class="highlight-red">balance goes positive or payments silently succeed past zero</span></span>
-    </p>
-  </section>
-  <section>
-    <h2>Pool Exhaustion Test</h2>
-    <pre><code class="javascript" data-trim>
-export const options = {
-  scenarios: {
-    pool_exhaustion: {
-      executor: 'ramping-vus',
-      startVUs: 1,
-      stages: [
-        { duration: '5s',  target: 50  },
-        { duration: '15s', target: 100 },
-        { duration: '5s',  target: 0   },
-      ],
-      exec: 'poolExhaustion',
-    },
-  },
-};
-
-export function poolExhaustion(data) {
-  http.post(`${API_URL}/api/users/${user.id}/pay`, { amount: 1 });
-}
-    </code></pre>
-    <p class="fragment">
-      Ramps up to <strong>100 concurrent users</strong>, pool cap is <strong>2 connections</strong><br/>
-      <span class="small" style="color: var(--slate-500);">Expected: all payments succeed &nbsp;·&nbsp; Actual: <span class="highlight-red">requests time out &amp; fail as the pool saturates</span></span>
-    </p>
-  </section>
-</section>
-
-<!-- ============================================================ -->
-<!-- DEMO -->
-<!-- ============================================================ -->
-<section>
-  <section>
-    <h2>Demo Time</h2>
-    <pre><code class="bash" data-trim>
-npm run test:expenses   # create expenses
-npm run test:race       # race condition
-npm run test:pool       # pool exhaustion
-    </code></pre>
-  </section>
-
-  <section>
-    <h2>Submit expenses</h2>
-    <iframe width="960" height="540" src="https://www.youtube.com/embed/m9-LLMe5j7E?si=z0HZluA72nFeFdrt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-  </section>
-
-  <section>
-    <h2>Race condition</h2>
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/4KhrpbVXZqo?si=1qU3teVsUnB0-DEw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-  </section>
-
-  <section>
-    <h2>Pool exhaustion</h2>
-    <iframe width="960" height="540" src="https://www.youtube.com/embed/91nEQ6gauvw?si=7R55tNShDR-i7DET" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-  </section>
-</section>
-
-<!-- ============================================================ -->
 <!-- TAKEAWAYS -->
 <!-- ============================================================ -->
 <section>
@@ -921,6 +898,28 @@ npm run test:pool       # pool exhaustion
 <!-- ============================================================ -->
 <section class="centered">
   <h1>Appendix</h1>
+</section>
+
+<section>
+  <h2 style="margin-bottom: 0.8em;">VU Executors</h2>
+  <table class="executors" style="font-size: 0.42em; margin: 1.2em auto; border-spacing: 0;">
+    <colgroup>
+      <col style="width: 38%;" />
+      <col style="width: 62%;" />
+    </colgroup>
+    <thead>
+      <tr><th>Executor</th><th>Use it for</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>shared-iterations</code></td><td>Fixed total iterations, split across VUs</td></tr>
+      <tr><td><code>per-vu-iterations</code></td><td>Fixed iterations <em>per</em> VU</td></tr>
+      <tr><td><code>constant-vus</code></td><td>Steady concurrency for a duration</td></tr>
+      <tr><td><code>ramping-vus</code></td><td>Ramp VUs through stages (stress, spike)</td></tr>
+      <tr><td><code>constant-arrival-rate</code></td><td>Constant <strong>iters/sec</strong> (open model)</td></tr>
+      <tr><td><code>ramping-arrival-rate</code></td><td>Ramp iters/sec; realistic RPS curves</td></tr>
+      <tr><td><code>externally-controlled</code></td><td>VUs driven at runtime via k6 API</td></tr>
+    </tbody>
+  </table>
 </section>
 
 <section>
