@@ -602,7 +602,31 @@
 <section>
   <section>
     <h2>Types of load testing</h2>
-    <img src="images/load-test-types.png" alt="Load test types at a glance" class="zoomable" style="width: 100%; max-height: 85vh; background: #ffffff; border-radius: 8px; padding: 0.5em; cursor: zoom-in;" />
+    <img src="images/diagram-0.jpg" alt="Load test types overview" class="zoomable" style="width: 100%; max-height: 80vh; background: #ffffff; border-radius: 8px; padding: 0.5em; cursor: zoom-in;" />
+  </section>
+  <section>
+    <h2>Smoke test</h2>
+    <img src="images/diagram-1-smoke.jpg" alt="Smoke test" style="width: 80%; border-radius: 8px;" />
+  </section>
+  <section>
+    <h2>Spike test</h2>
+    <img src="images/diagram-2-spike.jpg" alt="Spike test" style="width: 80%; border-radius: 8px;" />
+  </section>
+  <section>
+    <h2>Average load</h2>
+    <img src="images/diagram-3-avgload.jpg" alt="Average load test" style="width: 80%; border-radius: 8px;" />
+  </section>
+  <section>
+    <h2>Stress test</h2>
+    <img src="images/diagram-4-stress.jpg" alt="Stress test" style="width: 80%; border-radius: 8px;" />
+  </section>
+  <section>
+    <h2>Breakpoint test</h2>
+    <img src="images/diagram-5-breakpoint.jpg" alt="Breakpoint test" style="width: 80%; border-radius: 8px;" />
+  </section>
+  <section>
+    <h2>Soak test</h2>
+    <img src="images/diagram-6-soak.jpg" alt="Soak test" style="width: 80%; border-radius: 8px;" />
   </section>
   <section>
     <h2>Types of load testing</h2>
@@ -718,7 +742,6 @@ export async function uiTest() {
     </div>
   </section>
   <section class="centered">
-    <h2>Demo time</h2>
     <p style="font-size: 0.8em; color: var(--slate-500);">let's poke around</p>
   </section>
 </section>
@@ -757,7 +780,7 @@ export async function uiTest() {
   </section>
   <section>
     <h2>Concurrent expenses</h2>
-    <iframe width="960" height="540" src="https://www.youtube.com/embed/m9-LLMe5j7E?si=z0HZluA72nFeFdrt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/m9-LLMe5j7E?si=z0HZluA72nFeFdrt&start=8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </section>
   <section>
     <h2>Race Condition Test</h2>
@@ -807,8 +830,48 @@ export default function () {
 </section>
 
 <!-- ============================================================ -->
-<!-- THE BUGS -->
+<!-- TAKEAWAYS -->
 <!-- ============================================================ -->
+<section>
+  <h2>Takeaways</h2>
+  <ol>
+    <li class="fragment">Finds <em>issues</em> that other tests don't</li>
+    <li class="fragment">Can be a <em>communication tool</em></li>
+    <li class="fragment">Write <em>.js</em> with <em>.go</em> efficiency</li>
+    <li class="fragment"><em>AI</em> makes it more accessible than ever</li>
+  </ol>
+</section>
+
+<!-- ============================================================ -->
+<!-- QUESTIONS -->
+<!-- ============================================================ -->
+<section class="centered">
+  <h1>Questions?</h1>
+  <hr style="border: none; border-top: 1px solid var(--slate-200); margin: 1.2em auto; width: 40%;" />
+  <div style="display: flex; align-items: center; justify-content: center; gap: 3.5em; margin-top: 0.5em;">
+    <div style="text-align: left;">
+      <p style="font-size: 0.75em; color: var(--slate-500); margin: 0 0 0.5em 0;">Thank you! Let's connect</p>
+      <p class="small" style="line-height: 2; margin: 0;">
+        <a href="https://kalovelo.com/" target="_blank" style="color: var(--accent-600); text-decoration: none;">presentations.kalovelo.com</a><br/>
+        <a href="https://www.linkedin.com/in/kalovelo/" target="_blank" style="color: var(--accent-600); text-decoration: none;">linkedin.com/in/kalovelo</a><br/>
+        <a href="https://github.com/Kalovelo" target="_blank" style="color: var(--accent-600); text-decoration: none;">github.com/kalovelo</a><br/>
+        <a href="https://kalovelo.com/" target="_blank" style="color: var(--accent-600); text-decoration: none;">kalovelo.com</a>
+      </p> 
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <div id="qr-deck" class="qr-deck"></div>
+      <p style="font-family: 'EB Garamond', serif; font-size: .7em; color: var(--slate-500); margin: 0.6em 0 0 0;">grab the slides</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- APPENDIX -->
+<!-- ============================================================ -->
+<section class="centered">
+  <h1>Appendix</h1>
+</section>
+
 <section>
   <section>
     <h2>The bad code</h2>
@@ -855,49 +918,6 @@ const pool = new Pool({
       </div>
     </div>
   </section>
-</section>
-
-<!-- ============================================================ -->
-<!-- TAKEAWAYS -->
-<!-- ============================================================ -->
-<section>
-  <h2>Takeaways</h2>
-  <ol>
-    <li class="fragment">Finds <em>issues</em> that other tests don't</li>
-    <li class="fragment">Can be a <em>communication tool</em></li>
-    <li class="fragment">Write <em>.js</em> with <em>.go</em> efficiency</li>
-    <li class="fragment"><em>AI</em> makes it more accessible than ever</li>
-  </ol>
-</section>
-
-<!-- ============================================================ -->
-<!-- QUESTIONS -->
-<!-- ============================================================ -->
-<section class="centered">
-  <h1>Questions?</h1>
-  <hr style="border: none; border-top: 1px solid var(--slate-200); margin: 1.2em auto; width: 40%;" />
-  <div style="display: flex; align-items: center; justify-content: center; gap: 3.5em; margin-top: 0.5em;">
-    <div style="text-align: left;">
-      <p style="font-size: 0.75em; color: var(--slate-500); margin: 0 0 0.5em 0;">Thank you! Let's connect</p>
-      <p class="small" style="line-height: 2; margin: 0;">
-        <a href="https://kalovelo.com/" target="_blank" style="color: var(--accent-600); text-decoration: none;">presentations.kalovelo.com</a><br/>
-        <a href="https://www.linkedin.com/in/kalovelo/" target="_blank" style="color: var(--accent-600); text-decoration: none;">linkedin.com/in/kalovelo</a><br/>
-        <a href="https://github.com/Kalovelo" target="_blank" style="color: var(--accent-600); text-decoration: none;">github.com/kalovelo</a><br/>
-        <a href="https://kalovelo.com/" target="_blank" style="color: var(--accent-600); text-decoration: none;">kalovelo.com</a>
-      </p> 
-    </div>
-    <div style="display: flex; flex-direction: column; align-items: center;">
-      <div id="qr-deck" class="qr-deck"></div>
-      <p style="font-family: 'EB Garamond', serif; font-size: .7em; color: var(--slate-500); margin: 0.6em 0 0 0;">grab the slides</p>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================================ -->
-<!-- APPENDIX -->
-<!-- ============================================================ -->
-<section class="centered">
-  <h1>Appendix</h1>
 </section>
 
 <section>
