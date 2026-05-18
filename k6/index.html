@@ -204,6 +204,17 @@
     padding: 0.9em 1.4em;
   }
 
+  .reveal pre table,
+  .reveal pre table tr:nth-child(even) td {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+  .reveal pre table td {
+    border: none;
+    padding: 0 0.4em;
+  }
+
   .qr-deck {
     padding: 0.9em;
     background: #ffffff;
@@ -540,7 +551,7 @@
         <li><strong>Now</strong>; Sr. SWE (Wealthtech, UAE) | Founding SWE (Web3, EU) </li>
         <li><strong>Previously</strong>; SWE (Custodial crypto, UK) </li>
         <li><strong>Back then</strong>; Full-stack SWE (Blockchain / Open banking, EU) </li>
-        <li><strong>Stack</strong>; Node.js, TypeScript, DDD </li>
+        <li><strong>Stack</strong>; Node.js, TypeScript, <i style="color: var(--accent-600);">+beyond</i> </li>
       </ul>
       <p style="font-size: 0.5em; margin-top: 1em; color: var(--slate-500);">
         <strong>kalovelo.com</strong> &nbsp;|&nbsp; @kalovelo &nbsp;|&nbsp; /in/kalovelo
@@ -557,7 +568,7 @@
   <ol style="font-size: 0.8em; line-height: 1.4;">
     <li>What and why load testing?</li>
     <li>What is k6?</li>
-    <li>Demo-ing <i>SplitDumb</i></li>
+    <li>Practical example</li>
   </ol>
 </section>
 
@@ -604,38 +615,38 @@
     <h2>Types of load testing</h2>
     <img src="images/diagram-0.jpg" alt="Load test types overview" class="zoomable" style="width: 100%; max-height: 80vh; background: #ffffff; border-radius: 8px; padding: 0.5em; cursor: zoom-in;" />
   </section>
-  <section>
+  <section data-transition="fade">
     <h2>Smoke test</h2>
-    <img src="images/diagram-1-smoke.jpg" alt="Smoke test" style="width: 80%; border-radius: 8px;" />
+    <img src="images/diagram-1-smoke.jpg" alt="Smoke test" style="width: 100%; max-height: 80vh; background: #ffffff; border-radius: 8px; padding: 0.5em;" />
   </section>
-  <section>
+  <section data-transition="fade">
     <h2>Spike test</h2>
-    <img src="images/diagram-2-spike.jpg" alt="Spike test" style="width: 80%; border-radius: 8px;" />
+    <img src="images/diagram-2-spike.jpg" alt="Spike test" style="width: 100%; max-height: 80vh; background: #ffffff; border-radius: 8px; padding: 0.5em;" />
   </section>
-  <section>
+  <section data-transition="fade">
     <h2>Average load</h2>
-    <img src="images/diagram-3-avgload.jpg" alt="Average load test" style="width: 80%; border-radius: 8px;" />
+    <img src="images/diagram-3-avgload.jpg" alt="Average load test" style="width: 100%; max-height: 80vh; background: #ffffff; border-radius: 8px; padding: 0.5em;" />
   </section>
-  <section>
+  <section data-transition="fade">
     <h2>Stress test</h2>
-    <img src="images/diagram-4-stress.jpg" alt="Stress test" style="width: 80%; border-radius: 8px;" />
+    <img src="images/diagram-4-stress.jpg" alt="Stress test" style="width: 100%; max-height: 80vh; background: #ffffff; border-radius: 8px; padding: 0.5em;" />
   </section>
-  <section>
+  <section data-transition="fade">
     <h2>Breakpoint test</h2>
-    <img src="images/diagram-5-breakpoint.jpg" alt="Breakpoint test" style="width: 80%; border-radius: 8px;" />
+    <img src="images/diagram-5-breakpoint.jpg" alt="Breakpoint test" style="width: 100%; max-height: 80vh; background: #ffffff; border-radius: 8px; padding: 0.5em;" />
   </section>
-  <section>
+  <section data-transition="fade">
     <h2>Soak test</h2>
-    <img src="images/diagram-6-soak.jpg" alt="Soak test" style="width: 80%; border-radius: 8px;" />
+    <img src="images/diagram-6-soak.jpg" alt="Soak test" style="width: 100%; max-height: 80vh; background: #ffffff; border-radius: 8px; padding: 0.5em;" />
   </section>
-  <section>
+  <section data-transition="fade">
     <h2>Types of load testing</h2>
     <ul style="font-size: 0.75em; column-count: 2; column-gap: 2em; text-align: left;">
-      <li class="fragment" style="break-inside: avoid;">- <strong>Average load</strong>; expected production traffic<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">baseline performance under normal use</span></li>
-      <li class="fragment" style="break-inside: avoid;">- <strong>Stress test</strong>; above-average load, sustained<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">behavior at the edge of capacity</span></li>
-      <li class="fragment" style="break-inside: avoid;">- <strong>Soak test</strong>; sustained normal load for hours<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">memory leaks, connection drift, log/disk growth</span></li>
-      <li class="fragment" style="break-inside: avoid;">- <strong>Breakpoint test</strong>; push past capacity until the KA-BOOM<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">ceiling and how the system fails</span></li>
-      <li class="fragment" style="break-inside: avoid;">- <strong>Spike test</strong>; burst of traffic, then drop<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">autoscaling, cold caches, recovery behavior</span></li>
+      <li style="break-inside: avoid;">- <strong>Average load</strong>; expected production traffic<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">baseline performance under normal use</span></li>
+      <li style="break-inside: avoid;">- <strong>Stress test</strong>; above-average load, sustained<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">behavior at the edge of capacity</span></li>
+      <li style="break-inside: avoid;">- <strong>Soak test</strong>; sustained normal load for hours<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">memory leaks, connection drift, log/disk growth</span></li>
+      <li style="break-inside: avoid;">- <strong>Breakpoint test</strong>; push past capacity until the KA-BOOM<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">ceiling and how the system fails</span></li>
+      <li style="break-inside: avoid;">- <strong>Spike test</strong>; burst of traffic, then drop<br/><span style="padding-left: .5em; display: inline-block; font-size: 0.8em; color: var(--accent-600);">autoscaling, cold caches, recovery behavior</span></li>
     </ul>
   </section>
 </section>
@@ -654,12 +665,23 @@
 </section>
 
 <!-- ============================================================ -->
+<!-- TYPES OF TESTS -->
+<!-- ============================================================ -->
+<section>
+  <h2>High level examples</h2>
+  <div style="text-align: left; font-size: 0.7em; margin-top: 2em;">
+    <p style="margin: 1.8em 0;">&ldquo;Have 10 users hammer <code>/checkout</code> nonstop for 30 seconds.&rdquo;</p>
+    <p style="margin: 1.8em 0;">&ldquo;Start with 3 users per second, ramp to 50, then back down to 0.&rdquo;</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
 <!-- K6 BASICS -->
 <!-- ============================================================ -->
 <section>
   <section>
-    <h2>Minimal Example</h2>
-    <pre><code class="javascript" data-trim>
+    <h2>Minimal practical example</h2>
+    <pre><code class="javascript" data-trim data-line-numbers="|4-7|9-14">
 import http from 'k6/http';
 import { check } from 'k6';
 
@@ -677,11 +699,11 @@ export default function () {
     </code></pre>
   </section>
   <section>
-    <iframe width="960" height="540" src="https://www.youtube.com/embed/JTdy1Y-46lU?si=w2V6cGgBFajphR7J&start=10" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/2YePMna-QXU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </section>
   <section>
     <h2>Browser Module</h2>
-    <pre><code class="javascript" data-trim>
+    <pre><code class="javascript" data-trim data-line-numbers="|4-5,11-12|6-10|15-20">
 import { browser } from 'k6/browser';
 
 export const options = {
@@ -704,22 +726,16 @@ export async function uiTest() {
 }
     </code></pre>
   </section>
-  <section>
-    <h2>k6 Concepts</h2>
-    <ul style="text-align: left;">
-      <li>- <strong>VUs</strong> (Virtual Users); concurrent simulated users</li>
-      <li>- <strong>Scenarios</strong>; different load patterns</li>
-      <li>- <strong>Executors</strong>; how to schedule VUs</li>
-      <li>- <strong>Checks</strong>; unit-test like assertions </li>
-      <li>- <strong>Thresholds</strong>; pass/fail criteria <i>(!= 0 exit)</i></li>
-    </ul>
-  </section>
 </section>
 
 <!-- ============================================================ -->
 <!-- THE APP -->
 <!-- ============================================================ -->
 <section>
+  <section class="centered">
+    <h1>The demo</h1>
+    <p class="subtitle" style="font-size: 0.9em; margin-top: 0.6em;">a <span class="title-accent">Splitwise</span> clone</p>
+  </section>
   <section>
     <h2>The Demo App: <span class="title-accent">SplitDumb</span></h2>
     <p>A Splitwise vibe-coded clone</p>
@@ -780,7 +796,7 @@ export async function uiTest() {
   </section>
   <section>
     <h2>Concurrent expenses</h2>
-    <iframe width="960" height="540" src="https://www.youtube.com/embed/m9-LLMe5j7E?si=z0HZluA72nFeFdrt&start=8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/njT7p4eLsg0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </section>
   <section>
     <h2>Race Condition Test</h2>
@@ -805,7 +821,7 @@ export function raceCondition(data) {
   </section>
   <section>
     <h2>Race condition</h2>
-    <iframe width="960" height="540" src="https://www.youtube.com/embed/4KhrpbVXZqo?si=1qU3teVsUnB0-DEw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/qHlJcgCTCb8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </section>
   <section>
     <h2>Pool Exhaustion Test</h2>
@@ -825,7 +841,7 @@ export default function () {
   </section>
   <section>
     <h2>Pool exhaustion</h2>
-    <iframe width="960" height="540" src="https://www.youtube.com/embed/91nEQ6gauvw?si=7R55tNShDR-i7DET" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <iframe width="960" height="540" src="https://www.youtube.com/embed/GY2NSgdeU8Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </section>
 </section>
 
@@ -870,6 +886,54 @@ export default function () {
 <!-- ============================================================ -->
 <section class="centered">
   <h1>Appendix</h1>
+</section>
+
+<section>
+  <h2>k6 Concepts</h2>
+  <ul style="text-align: left;">
+    <li>- <strong>VUs</strong> (Virtual Users); concurrent simulated users</li>
+    <li>- <strong>Scenarios</strong>; different load patterns</li>
+    <li>- <strong>Executors</strong>; how to schedule VUs</li>
+    <li>- <strong>Checks</strong>; unit-test like assertions </li>
+    <li>- <strong>Thresholds</strong>; pass/fail criteria <i>(!= 0 exit)</i></li>
+  </ul>
+</section>
+
+<section>
+  <h2 style="margin-bottom: 0.8em;">VU Executors</h2>
+  <table class="executors" style="font-size: 0.42em; margin: 1.2em auto; border-spacing: 0;">
+    <colgroup>
+      <col style="width: 38%;" />
+      <col style="width: 62%;" />
+    </colgroup>
+    <thead>
+      <tr><th>Executor</th><th>Use it for</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>shared-iterations</code></td><td>Fixed total iterations, split across VUs</td></tr>
+      <tr><td><code>per-vu-iterations</code></td><td>Fixed iterations <em>per</em> VU</td></tr>
+      <tr><td><code>constant-vus</code></td><td>Steady concurrency for a duration</td></tr>
+      <tr><td><code>ramping-vus</code></td><td>Ramp VUs through stages (stress, spike)</td></tr>
+      <tr><td><code>constant-arrival-rate</code></td><td>Constant <strong>iters/sec</strong> (open model)</td></tr>
+      <tr><td><code>ramping-arrival-rate</code></td><td>Ramp iters/sec; realistic RPS curves</td></tr>
+      <tr><td><code>externally-controlled</code></td><td>VUs driven at runtime via k6 API</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Thresholds</h2>
+  <pre><code class="javascript" data-trim>
+thresholds: {
+  page_load_duration: ['p(95)<3000'],
+  custom_errors: ['count<50'],
+
+  race_condition_drift: ['count==0'],
+  pool_exhaustion_errors: ['count==0'],
+}
+  </code></pre>
+  <p class="fragment">Thresholds make k6 tests <strong>CI/CD-friendly</strong><br/>
+  non-zero exit code on failure</p>
 </section>
 
 <section>
@@ -918,43 +982,6 @@ const pool = new Pool({
       </div>
     </div>
   </section>
-</section>
-
-<section>
-  <h2 style="margin-bottom: 0.8em;">VU Executors</h2>
-  <table class="executors" style="font-size: 0.42em; margin: 1.2em auto; border-spacing: 0;">
-    <colgroup>
-      <col style="width: 38%;" />
-      <col style="width: 62%;" />
-    </colgroup>
-    <thead>
-      <tr><th>Executor</th><th>Use it for</th></tr>
-    </thead>
-    <tbody>
-      <tr><td><code>shared-iterations</code></td><td>Fixed total iterations, split across VUs</td></tr>
-      <tr><td><code>per-vu-iterations</code></td><td>Fixed iterations <em>per</em> VU</td></tr>
-      <tr><td><code>constant-vus</code></td><td>Steady concurrency for a duration</td></tr>
-      <tr><td><code>ramping-vus</code></td><td>Ramp VUs through stages (stress, spike)</td></tr>
-      <tr><td><code>constant-arrival-rate</code></td><td>Constant <strong>iters/sec</strong> (open model)</td></tr>
-      <tr><td><code>ramping-arrival-rate</code></td><td>Ramp iters/sec; realistic RPS curves</td></tr>
-      <tr><td><code>externally-controlled</code></td><td>VUs driven at runtime via k6 API</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<section>
-  <h2>Thresholds</h2>
-  <pre><code class="javascript" data-trim>
-thresholds: {
-  page_load_duration: ['p(95)<3000'],
-  custom_errors: ['count<50'],
-
-  race_condition_drift: ['count==0'],
-  pool_exhaustion_errors: ['count==0'],
-}
-  </code></pre>
-  <p class="fragment">Thresholds make k6 tests <strong>CI/CD-friendly</strong><br/>
-  non-zero exit code on failure</p>
 </section>
 
 </div>
