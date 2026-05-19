@@ -7,7 +7,7 @@ const pool = new Pool({
   user: process.env.DB_USER || "splitdumb",
   password: process.env.DB_PASSWORD || "splitdumb",
   max: 2,
-  connectionTimeoutMillis: 80,
+  connectionTimeoutMillis: 30,
 });
 
 async function initSchema() {

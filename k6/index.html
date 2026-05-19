@@ -11,6 +11,18 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/github.css" />
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PKS0ENMMQY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'G-PKS0ENMMQY');
+</script>
+
+
 <style>
   :root {
     --accent-400: #a3d0ff;
@@ -805,6 +817,9 @@ export async function uiTest() {
   <section>
     <h2>Test Configuration</h2>
     <pre><code class="javascript" data-trim data-line-numbers="|2-8|9-11|15-17">
+
+const raceConditionDrift = new Counter('race_condition_drift');
+
 export const options = {
   scenarios: {
     race_condition: {
@@ -822,7 +837,6 @@ export function setup() {
   return seed();
 }
     </code></pre>
-    <p class="small">10 VUs &times; 10 iterations = <strong>100 payments</strong>; integrity check runs in <code>teardown()</code></p>
   </section>
   <section>
     <h2>Race Condition Test</h2>
@@ -860,9 +874,6 @@ export function teardown(data) {
 }
     </code></pre>
     <p class="small"><code>teardown()</code> is the opposite of <code>setup()</code>; runs once after all VUs finish</p>
-    <div class="ok-box fragment" style="font-size: 0.55em; display: inline-block; padding: 0.4em 0.8em;">
-      ↑ feeds <code>thresholds: { race_condition_drift: ['count==0'] }</code>
-    </div>
   </section>
   <section>
     <h2>Race condition</h2>
