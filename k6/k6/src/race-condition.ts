@@ -4,7 +4,6 @@ import { Counter } from 'k6/metrics';
 import type { Options } from 'k6/options';
 import { API_URL, seed, SeedData, User } from './helpers';
 
-const errors = new Counter('custom_errors');
 const raceConditionDrift = new Counter('race_condition_drift');
 
 export const options: Options = {
@@ -13,14 +12,6 @@ export const options: Options = {
       executor: 'per-vu-iterations',
       vus: 10,
       iterations: 10,
-      exec: 'raceCondition',
-    },
-    integrity_check: {
-      executor: 'per-vu-iterations',
-      vus: 1,
-      iterations: 1,
-      startTime: '10s',
-      exec: 'integrityCheck',
     },
   },
   thresholds: {
@@ -32,7 +23,7 @@ export function setup(): SeedData {
   return seed();
 }
 
-export function raceCondition(data: SeedData): void {
+export default function (data: SeedData): void {
   if (!data.users || data.users.length === 0) return;
 
   const targetUser = data.users[0];
@@ -41,10 +32,10 @@ export function raceCondition(data: SeedData): void {
     JSON.stringify({ amount: 10 }),
     { headers: { 'Content-Type': 'application/json' } },
   );
-  check(res, { 'pay accepted': (r) => r.status === 200 }) || errors.add(1);
+  check(res, { 'pay accepted': (r) => r.status === 200 });
 }
 
-export function integrityCheck(data: SeedData): void {
+export function teardown(data: SeedData): void {
   if (!data.users || data.users.length === 0) return;
 
   const targetUser = data.users[0];
@@ -52,7 +43,7 @@ export function integrityCheck(data: SeedData): void {
     tags: { type: 'read', endpoint: 'integrity' },
   });
 
-  check(res, { 'GET user 200': (r) => r.status === 200 }) || errors.add(1);
+  check(res, { 'GET user 200': (r) => r.status === 200 });
 
   if (res.status === 200) {
     const user = JSON.parse(res.body as string) as User;

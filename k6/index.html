@@ -703,12 +703,13 @@ export default function () {
   </section>
   <section>
     <h2>Browser Module</h2>
-    <pre><code class="javascript" data-trim data-line-numbers="|4-5,11-12|6-10|15-20">
+    <pre><code class="javascript" data-trim data-line-numbers="|4-5,12-13|6-11|15-22|17-23">
 import { browser } from 'k6/browser';
 
 export const options = {
   scenarios: {
     ui: {
+      // each VU gets a fixed number of iterations
       executor: 'per-vu-iterations',
       vus: 5,
       iterations: 3,
@@ -721,7 +722,10 @@ export const options = {
 export async function uiTest() {
   const page = await browser.newPage();
   await page.goto('http://localhost:3001/');
-  // interact with the page like a real user
+
+  await page.locator('input[name="email"]').type('user@test.com');
+  await page.locator('button[type="submit"]').click();
+
   await page.close();
 }
     </code></pre>
@@ -799,25 +803,66 @@ export async function uiTest() {
     <iframe width="960" height="540" src="https://www.youtube.com/embed/njT7p4eLsg0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </section>
   <section>
-    <h2>Race Condition Test</h2>
-    <pre><code class="javascript" data-trim>
-export function raceCondition(data) {
-  const page = await browser.newPage();
-  await page.goto(`${BASE_URL}/users/${user.id}/wallet`);
+    <h2>Test Configuration</h2>
+    <pre><code class="javascript" data-trim data-line-numbers="|2-8|9-11|15-17">
+export const options = {
+  scenarios: {
+    race_condition: {
+      executor: 'per-vu-iterations',
+      vus: 10,
+      iterations: 10,
+    },
+  },
+  thresholds: {
+    race_condition_drift: ['count==0'],
+  },
+};
 
-  const payInput = page.locator('[data-testid="pay-amount"]');
-  const payBtn = page.locator('[data-testid="pay-btn"]');
-
-  await payInput.fill('10');
-  await payBtn.click();
-
-  await page.close();
+export function setup() {
+  return seed();
 }
     </code></pre>
-    <p class="fragment">
-      <strong>100 payments of $10</strong> from a <strong>$1,000</strong> wallet<br/>
-      <span class="small" style="color: var(--slate-500);">Expected: <strong>$0</strong> &nbsp;·&nbsp; Actual: <span class="highlight-red">balance goes positive or payments silently succeed past zero</span></span>
-    </p>
+    <p class="small">10 VUs &times; 10 iterations = <strong>100 payments</strong>; integrity check runs in <code>teardown()</code></p>
+  </section>
+  <section>
+    <h2>Race Condition Test</h2>
+    <pre><code class="javascript" data-trim>
+export default function (data) {
+  const user = data.users[0];
+
+  const res = http.post(
+    `${API_URL}/api/users/${user.id}/pay`,
+    JSON.stringify({ amount: 10 }),
+    { headers: { 'Content-Type': 'application/json' } },
+  );
+
+  check(res, { 'pay accepted': (r) => r.status === 200 });
+}
+    </code></pre>
+  </section>
+  <section>
+    <h2>Integrity Check</h2>
+    <pre><code class="javascript" data-trim data-line-numbers="|1|2-4|6-9|11-15">
+export function teardown(data) {
+  const user = data.users[0];
+  const res = http.get(`${API_URL}/api/users/${user.id}`);
+  const balance = parseFloat(JSON.parse(res.body).balance);
+
+  const expected = 0;
+  const drift = balance - expected;
+
+  console.log(`Expected: $${expected}, Actual: $${balance}, Drift: $${drift}`);
+
+  if (drift > 0) {
+    console.log(`BUG: $${drift} was "created" due to lost updates!`);
+    raceConditionDrift.add(1);
+  }
+}
+    </code></pre>
+    <p class="small"><code>teardown()</code> is the opposite of <code>setup()</code>; runs once after all VUs finish</p>
+    <div class="ok-box fragment" style="font-size: 0.55em; display: inline-block; padding: 0.4em 0.8em;">
+      ↑ feeds <code>thresholds: { race_condition_drift: ['count==0'] }</code>
+    </div>
   </section>
   <section>
     <h2>Race condition</h2>
@@ -934,6 +979,17 @@ thresholds: {
   </code></pre>
   <p class="fragment">Thresholds make k6 tests <strong>CI/CD-friendly</strong><br/>
   non-zero exit code on failure</p>
+</section>
+
+<section>
+  <h2>Percentiles <span style="font-family: 'SF Mono', monospace;">p(X)</span></h2>
+  <p><code>p(95) = 300ms</code> means <strong>95%</strong> of requests finished in &le; 300ms <span style="font-size: 0.7em; color: var(--slate-400);">(the slowest 5% were worse)</span></p>
+  <ul style="font-size: 0.85em;">
+    <li>- <code>p(50)</code>; the <em>median</em>; typical user experience</li>
+    <li>- <code>p(95)</code>; the common SLO target</li>
+    <li>- <code>p(99)</code>; tail latency; what your unluckiest users feel</li>
+  </ul>
+  <p class="fragment small">Averages hide outliers. A p(99) of 8s with a 200ms average means 1 in 100 users is having a bad day.</p>
 </section>
 
 <section>

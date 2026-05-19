@@ -15,5 +15,8 @@ export const options = {
 export async function uiTest() {
   const page = await browser.newPage();
   await page.goto('http://localhost:3001/');
+  await page.locator('input[name="login"]').type('admin');
+  await page.locator('input[name="password"]').type('123');
+  await page.locator('button[type="submit"]').click();
   await page.close();
 }
