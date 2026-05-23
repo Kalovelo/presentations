@@ -67,24 +67,7 @@
     }
 
     .card {
-      display: block;
-      text-decoration: none;
       padding: 0.5rem 0;
-      transition: opacity 0.15s;
-    }
-
-    .card:hover {
-      opacity: 0.7;
-    }
-
-    .card-tag {
-      font-family: 'Kode Mono', monospace;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent-600);
-      margin-bottom: 0.6rem;
     }
 
     .card-title {
@@ -100,6 +83,47 @@
       font-size: 1rem;
       color: var(--slate-500);
       line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-meta {
+      font-family: 'Kode Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      color: var(--slate-500);
+      margin-bottom: 0.7rem;
+    }
+
+    .card-meta a {
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-color: var(--slate-300);
+      text-underline-offset: 2px;
+      transition: color 0.15s;
+    }
+
+    .card-meta a:hover {
+      color: var(--accent-500);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .card-actions a {
+      font-family: 'Kode Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent-600);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .card-actions a:hover {
+      color: var(--accent-400);
     }
 
     .theme-toggle {
@@ -166,10 +190,23 @@
   </header>
 
   <div class="grid">
-    <a class="card" href="k6/index.html">
+    <div class="card">
       <div class="card-title">k6</div>
       <div class="card-desc">How to nuke (or load test) your services with k6</div>
-    </a>
+      <div class="card-meta"><a href="https://skgjs.gr" target="_blank" rel="noopener">8th skg.js meetup</a> ; May 21, 2026</div>
+      <div class="card-actions">
+        <a href="k6/index.html">slides &#8599;</a>
+        <a href="https://www.youtube.com/watch?v=1nWYAjyT9Ms" target="_blank" rel="noopener">video &#8599;</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">&AElig;ternity State Channels</div>
+      <div class="card-desc">Reliable and limitless contract calls with State Channels</div>
+      <div class="card-meta"><a href="https://aeternityuniverse.com/aeternity-universe-two/" target="_blank" rel="noopener">&AElig;ternity Universe Two</a> ; Sep 16, 2022</div>
+      <div class="card-actions">
+        <a href="https://www.youtube.com/watch?v=x7_8jh0OmPA" target="_blank" rel="noopener">video &#8599;</a>
+      </div>
+    </div>
   </div>
   <footer>
     <a href="https://kalovelo.com" target="_blank">kalovelo.com</a>
